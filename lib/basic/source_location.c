@@ -64,7 +64,7 @@ source_range_t range_cat(source_range_t* begin, source_range_t* end) {
   return result;
 }
 
-void print_range(source_range_t* range, size_t indent_num, FILE* stream) {
+void emit_range(source_range_t* range, size_t indent_num, FILE* stream) {
   assert(range != NULL);
   assert(stream != NULL);
 

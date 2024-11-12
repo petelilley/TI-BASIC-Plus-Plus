@@ -1,1 +1,10 @@
 DIAG(FATAL_ERROR, OPT_INVALID, "invalid option '%s'")
+
+DIAG_LOCATION(FATAL_ERROR, TOKEN_INVALID, "invalid token '%c' (0x%02x)")
+DIAG_LOCATION(FATAL_ERROR, UNTERMINATED_BLOCK_COMMENT, "unterminated /* comment")
+DIAG_LOCATION(FATAL_ERROR, UNTERMINATED_STRING_LITERAL, "unterminated string literal")
+
+DIAG_LOCATION(FATAL_ERROR, INVALID_SUFFIX_ON_NUMERIC_LITERAL, "invalid suffix on numeric literal '%c'")
+DIAG_LOCATION(FATAL_ERROR, INVALID_SUFFIX_ON_OCTAL_LITERAL, "invalid suffix on octal literal '%c'")
+DIAG_LOCATION(FATAL_ERROR, INVALID_SUFFIX_ON_BINARY_LITERAL, "invalid suffix on binary literal '%c'")
+DIAG_LOCATION(FATAL_ERROR, INVALID_SUFFIX_ON_HEXADECIMAL_LITERAL, "invalid suffix on hexadecimal literal '%c'")
