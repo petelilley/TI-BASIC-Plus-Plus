@@ -1,7 +1,14 @@
 #include <driver/options.h>
 
+#include <ti-basic-plus-plus/basic/input_file.h>
+#include <ti-basic-plus-plus/lexer/lexer.h>
+
+static diagnostics_t d;
+
+static void compile(void);
+
 int main(int argc, const char** argv) {
-  diagnostics_t d = diagnostics_create();
+  d = diagnostics_create();
 
   do {
     parse_arguments(argc, argv, &d);
@@ -9,20 +16,55 @@ int main(int argc, const char** argv) {
       break;
     }
 
-    printf("invocation: %s\n", driver_config.invocation);
-    printf("input_path: %s\n", driver_config.input_path);
-    printf("output_path: %s\n", driver_config.output_path);
-    printf("source_path: %s\n", driver_config.source_path);
-    printf("tibasic_path: %s\n", driver_config.tibasic_path);
-    printf("program_path: %s\n", driver_config.program_path);
-    printf("output_program_name: %.*s\n", 8, driver_config.program_name);
-    printf("send: %d\n", driver_config.send);
-    printf("verbose: %d\n", driver_config.verbose);
-    printf("dump_tokens: %d\n", driver_config.dump_tokens);
-    printf("dump_ast: %d\n", driver_config.dump_ast);
+    if (driver_config.source_path != NULL) {
+      compile();
+      if (should_exit(&d)) {
+        break;
+      }
+    }
+  } while (false);
+
+  return get_exit_status(&d);
+}
+
+static void compile(void) {
+  assert(driver_config.source_path != NULL);
+
+  input_file_t input_file;
+
+  if (!if_init(&input_file, driver_config.input_path)) {
+    diag_report_file(&d, driver_config.input_path, FATAL_ERROR_FILE_OPEN_FAILED);
+    return;
+  }
+
+  token_t* head_token = NULL;
+  // ast_node_t* ast_root = NULL;
+
+  do {
+    // Lexical analysis
+
+    head_token = tokenize_file(&input_file, &d);
+    if (head_token == NULL) {
+      return;
+    }
+    if (should_exit(&d)) {
+      break;
+    }
+
+    if (driver_config.dump_tokens) {
+      emit_token_list(head_token, stdout);
+    }
+
+    // TODO: Parsing, semantic analysis, code generation
 
   } while (false);
 
-  return 0;
-}
+  // if (ast_root != NULL) {
+  //   ast_node_destroy(ast_root);
+  // }
+  if (head_token != NULL) {
+    token_list_destroy(head_token);
+  }
 
+  if_destroy(&input_file);
+}

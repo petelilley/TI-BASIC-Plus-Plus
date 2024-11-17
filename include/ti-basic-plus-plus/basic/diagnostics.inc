@@ -15,6 +15,8 @@ DIAG_FILE(FATAL_ERROR, FILE_MISSING, "no such file")
 DIAG_FILE(FATAL_ERROR, PATH_IS_A_DIRECTORY, "is a directory")
 DIAG_FILE(FATAL_ERROR, FILE_NOT_REGULAR, "not a regular file")
 
+DIAG_FILE(FATAL_ERROR, FILE_OPEN_FAILED, "failed to open file")
+
 DIAG_FILE(FATAL_ERROR, 8XP_FILENAME_TOO_LONG, "output 8xp program name cannot be longer than 8 characters")
 DIAG_FILE(FATAL_ERROR, 8XP_FILENAME_EMPTY, "output 8xp program name cannot be empty")
 DIAG_FILE(FATAL_ERROR, 8XP_FILENAME_NOT_UPPERCASE, "output 8xp program name must be uppercase")

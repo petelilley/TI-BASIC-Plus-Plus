@@ -4,7 +4,6 @@
 #include <ti-basic-plus-plus/basic/file_type.h>
 
 #include <assert.h>
-#include <ctype.h>
 #include <stb_ds.h>
 #include <stdio.h>
 #include <string.h>
