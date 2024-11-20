@@ -2,6 +2,8 @@
 
 #include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/lexer/lexer.h>
+#include <ti-basic-plus-plus/parser/ast_node.h>
+#include <ti-basic-plus-plus/parser/parser.h>
 
 static diagnostics_t d;
 
@@ -38,16 +40,13 @@ static void compile(void) {
   }
 
   token_t* head_token = NULL;
-  // ast_node_t* ast_root = NULL;
+  ast_node_t* ast_root = NULL;
 
   do {
     // Lexical analysis
 
     head_token = tokenize_file(&input_file, &d);
-    if (head_token == NULL) {
-      return;
-    }
-    if (should_exit(&d)) {
+    if (head_token == NULL || should_exit(&d)) {
       break;
     }
 
@@ -55,13 +54,22 @@ static void compile(void) {
       emit_token_list(head_token, stdout);
     }
 
-    // TODO: Parsing, semantic analysis, code generation
+    ast_root = parse_tokens(head_token, &d);
+    if (ast_root == NULL || should_exit(&d)) {
+      break;
+    }
+
+    if (driver_config.dump_ast) {
+      emit_ast(ast_root, stdout);
+    }
+
+    // TODO: Semantic analysis, code generation
 
   } while (false);
 
-  // if (ast_root != NULL) {
-  //   ast_node_destroy(ast_root);
-  // }
+  if (ast_root != NULL) {
+    ast_node_destroy(ast_root);
+  }
   if (head_token != NULL) {
     token_list_destroy(head_token);
   }
