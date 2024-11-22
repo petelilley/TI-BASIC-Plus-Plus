@@ -10,19 +10,17 @@
 
 driver_config_t driver_config;
 
-#define OPT_NAME(name) &"-" name[1]
-
 // clang-format off
 const option_t driver_options[] = {
-    {OPTION_HELP,                false,     NULL, {OPT_NAME("h"), OPT_NAME("help")}, "Print this help message, then exit"},
-    {OPTION_VERSION,             false,     NULL, {OPT_NAME("version"),       NULL}, "Print the compiler version, then exit"},
-    {OPTION_WARNINGS_AS_ERRORS,  false,     NULL, {OPT_NAME("Werror"),        NULL}, "Treat warnings as errors"},
-    {OPTION_OUTPUT,              true,  "<file>", {OPT_NAME("o"),             NULL}, "Write output to file"},
-    {OPTION_SEND_OUTPUT,         false,     NULL, {OPT_NAME("s"), OPT_NAME("send")}, "Send output program to calculator"},
-    {OPTION_VERBOSE,             false,     NULL, {OPT_NAME("v"),             NULL}, "Enable verbose output"},
-    {OPTION_SUPPRESS_WARNINGS,   false,     NULL, {OPT_NAME("w"),             NULL}, "Suppress warnings"},
-    {OPTION_DUMP_TOKENS,         false,     NULL, {OPT_NAME("dump-tokens"),   NULL}, "Emit parsed tokens"},
-    {OPTION_DUMP_AST,            false,     NULL, {OPT_NAME("dump-ast"),      NULL}, "Emit generated AST"},
+    {OPTION_HELP,                false,     NULL, {"h",           "help"}, "Print this help message, then exit"},
+    {OPTION_VERSION,             false,     NULL, {"version",       NULL}, "Print the compiler version, then exit"},
+    {OPTION_WARNINGS_AS_ERRORS,  false,     NULL, {"Werror",        NULL}, "Treat warnings as errors"},
+    {OPTION_OUTPUT,              true,  "<file>", {"o",             NULL}, "Write output to file"},
+    {OPTION_SEND_OUTPUT,         false,     NULL, {"s",           "send"}, "Send output program to calculator"},
+    {OPTION_VERBOSE,             false,     NULL, {"v",             NULL}, "Enable verbose output"},
+    {OPTION_SUPPRESS_WARNINGS,   false,     NULL, {"w",             NULL}, "Suppress warnings"},
+    {OPTION_DUMP_TOKENS,         false,     NULL, {"dump-tokens",   NULL}, "Emit parsed tokens"},
+    {OPTION_DUMP_AST,            false,     NULL, {"dump-ast",      NULL}, "Emit generated AST"},
 };
 // clang-format on
 
@@ -33,11 +31,12 @@ static void print_version(void);
 
 static void driver_config_init(void);
 
-static void process_input_options(input_option_t* input_options, const char** input_paths,
+static void process_input_options(input_option_t* input_options,
+                                  const char** input_paths,
                                   diagnostics_t* d);
 
 static void driver_config_init(void) {
-  memset(&driver_config, 0, sizeof(driver_config_t));
+  (void)memset(&driver_config, 0, sizeof(driver_config_t));
 }
 
 void parse_arguments(int argc, const char** argv, diagnostics_t* d) {
@@ -74,7 +73,8 @@ CLEANUP:
   return;
 }
 
-static void process_input_options(input_option_t* input_options, const char** input_paths,
+static void process_input_options(input_option_t* input_options,
+                                  const char** input_paths,
                                   diagnostics_t* d) {
   assert(d != NULL);
   bool seen_options[_OPTION_COUNT] = {0};
@@ -172,7 +172,6 @@ static void process_input_options(input_option_t* input_options, const char** in
 
   // Check output file extension
 
-
   if (driver_config.output_path == NULL) {
     if (input_extension != FILE_EXT_8XP || !driver_config.send) {
       diag_report(d, FATAL_ERROR_NO_OUTPUT);
@@ -184,7 +183,8 @@ static void process_input_options(input_option_t* input_options, const char** in
         get_file_extension(driver_config.output_path, &output_extension_ptr);
 
     if (driver_config.send && output_extension != FILE_EXT_8XP) {
-      diag_report_file(d, driver_config.output_path, FATAL_ERROR_SEND_OUTPUT_NOT_8XP);
+      diag_report_file(d, driver_config.output_path,
+                       FATAL_ERROR_SEND_OUTPUT_NOT_8XP);
       return;
     }
 
@@ -219,25 +219,16 @@ static void process_input_options(input_option_t* input_options, const char** in
         return;
       default:
         diag_report_file(d, driver_config.output_path,
-                         FATAL_ERROR_UNKNOWN_FILE_EXTENSION, output_extension_ptr);
+                         FATAL_ERROR_UNKNOWN_FILE_EXTENSION,
+                         output_extension_ptr);
         return;
     }
   }
 }
 
 static void print_usage(FILE* output) {
-  fprintf(output, "Usage: ti-basic++ <task> [options] <input file>\n");
-  fprintf(output, "Tasks:\n");
-
-  // clang-format off
-  fputs("  build              Compile a TI-BASIC++ program\n", output);
-  fputs("  send               Send a compiled .8xp program to a calculator\n", output);
-  fputs("  buildsend          Compile a TI-BASIC++ program and send it to a calculator\n", output);
-  fputs("  help               Print this help message, then exit\n", output);
-  fputs("  version            Print the compiler version, then exit\n", output);
-  // clang-format on
-
-  fprintf(output, "\nOptions:\n");
+  (void)fprintf(output, "Usage: ti-basic++ [options] <input file>\n");
+  (void)fprintf(output, "\nOptions:\n");
 
   static const size_t MAX_HELP_OFFSET = 21;
 
@@ -250,33 +241,33 @@ static void print_usage(FILE* output) {
 
     size_t help_offset = 2 + 1 + strlen(option->names[0]);
 
-    fprintf(output, "  -%s", option->names[0]);
+    (void)fprintf(output, "  -%s", option->names[0]);
 
     if (option->has_value) {
       if (option->value_name != NULL) {
-        fprintf(output, " %s", option->value_name);
+        (void)fprintf(output, " %s", option->value_name);
         help_offset += 1 + strlen(option->value_name);
       } else {
-        fprintf(output, " <value>");
+        (void)fprintf(output, " <value>");
         help_offset += 8;
       }
     }
 
     if (help_offset >= MAX_HELP_OFFSET) {
-      fputc('\n', output);
+      (void)fputc('\n', output);
       help_offset = 0;
     }
 
     while (help_offset < MAX_HELP_OFFSET) {
-      fputc(' ', output);
+      (void)fputc(' ', output);
       ++help_offset;
     }
 
-    fprintf(output, "%s\n", option->help);
+    (void)fprintf(output, "%s\n", option->help);
   }
 }
 
 static void print_version(void) {
-  printf("ti-basic++ version 0.0.1\n");
+  (void)printf("ti-basic++ version 0.0.1\n");
 }
 
