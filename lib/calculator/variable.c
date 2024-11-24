@@ -1,16 +1,19 @@
 #include <ti-basic-plus-plus/calculator/variable.h>
 
 variable_type_t keyword_to_variable_type(keyword_kind_t kind) {
-  (void)kind;
-
-  return VAR_UNKNOWN;
+  switch (kind) {
+    case KW_VOID:
+      return VAR_VOID;
+    case KW_NUMBER:
+      return VAR_NUMBER;
+    case KW_STRING:
+      return VAR_STRING;
+    case KW_MATRIX:
+      return VAR_MATRIX;
+    case KW_LIST:
+      return VAR_LIST;
+    default:
+      return VAR_UNKNOWN;
+  }
 }
 
-bool match_variable(const char* string, size_t length, variable_t* var) {
-  (void)string;
-  (void)length;
-  (void)var;
-
-  return false;
-}
- 

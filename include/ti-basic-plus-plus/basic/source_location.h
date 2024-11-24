@@ -34,7 +34,8 @@ source_range_t range_create(struct input_file* file,
                             source_position_t begin,
                             source_position_t end);
 
-static inline source_range_t range_at(struct input_file* file, source_position_t position) {
+static inline source_range_t range_at(struct input_file* file,
+                                      source_position_t position) {
   assert(file != NULL);
   return range_create(file, position, position);
 }

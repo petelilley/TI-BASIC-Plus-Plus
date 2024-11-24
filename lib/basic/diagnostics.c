@@ -82,7 +82,7 @@ static void emit_code(FILE* stream, source_range_t* range);
 void diagnostics_init(diagnostics_t* d) {
   assert(d != NULL);
 
-  memset(d, 0, sizeof(diagnostics_t));
+  (void)memset(d, 0, sizeof(diagnostics_t));
   d->max_errors = 64;
 }
 
@@ -352,8 +352,7 @@ static void emit_code(FILE* stream, source_range_t* range) {
   if (multiline) {
     assert(line_length >= range->begin.column);
     problem_length = line_length - range->begin.column;
-  }
-  else {
+  } else {
     problem_length = range->end.column - range->begin.column;
   }
   for (size_t i = 0; i < problem_length; ++i) {

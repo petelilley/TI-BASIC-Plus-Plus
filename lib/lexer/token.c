@@ -131,7 +131,7 @@ static void emit_token_unknown(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_UNKNOWN);
 
-  fputs("Token: Unknown\n", stream);
+  (void)fputs("Token: Unknown\n", stream);
   emit_range(&token->location, 1, stream);
 }
 
@@ -140,11 +140,11 @@ static void emit_token_identifier(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_IDENTIFIER);
 
-  fputs("Token: Identifier\n", stream);
+  (void)fputs("Token: Identifier\n", stream);
   emit_range(&token->location, 1, stream);
 
-  fprintf(stream, "\tText: '%.*s'\n", (int)arrlen(token->data.string),
-          token->data.string);
+  (void)fprintf(stream, "\tText: '%.*s'\n", (int)arrlen(token->data.string),
+                token->data.string);
 }
 
 static void emit_token_keyword(token_t* token, FILE* stream) {
@@ -152,10 +152,11 @@ static void emit_token_keyword(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_KEYWORD);
 
-  fputs("Token: Keyword\n", stream);
+  (void)fputs("Token: Keyword\n", stream);
   emit_range(&token->location, 1, stream);
 
-  fprintf(stream, "\tValue: '%s'\n", keyword_to_string(token->data.keyword));
+  (void)fprintf(stream, "\tValue: '%s'\n",
+                keyword_to_string(token->data.keyword));
 }
 
 static void emit_token_punctuator(token_t* token, FILE* stream) {
@@ -163,10 +164,11 @@ static void emit_token_punctuator(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_PUNCTUATOR);
 
-  fputs("Token: Punctuator\n", stream);
+  (void)fputs("Token: Punctuator\n", stream);
   emit_range(&token->location, 1, stream);
 
-  fprintf(stream, "\tValue: '%s'\n", punct_to_string(token->data.punctuator));
+  (void)fprintf(stream, "\tValue: '%s'\n",
+                punct_to_string(token->data.punctuator));
 }
 
 static void emit_token_number_literal(token_t* token, FILE* stream) {
@@ -174,10 +176,10 @@ static void emit_token_number_literal(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_NUMBER_LITERAL);
 
-  fputs("Token: Number Literal\n", stream);
+  (void)fputs("Token: Number Literal\n", stream);
   emit_range(&token->location, 1, stream);
 
-  fprintf(stream, "\tValue: '%f'\n", token->data.number);
+  (void)fprintf(stream, "\tValue: '%f'\n", token->data.number);
 }
 
 static void emit_token_string_literal(token_t* token, FILE* stream) {
@@ -185,11 +187,11 @@ static void emit_token_string_literal(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_STRING_LITERAL);
 
-  fputs("Token: String Literal\n", stream);
+  (void)fputs("Token: String Literal\n", stream);
   emit_range(&token->location, 1, stream);
 
-  fprintf(stream, "\tText: '%.*s'\n", (int)arrlen(token->data.string),
-          token->data.string);
+  (void)fprintf(stream, "\tText: '%.*s'\n", (int)arrlen(token->data.string),
+                token->data.string);
 }
 
 static void emit_token_newline(token_t* token, FILE* stream) {
@@ -197,7 +199,7 @@ static void emit_token_newline(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_NEWLINE);
 
-  fputs("Token: Newline\n", stream);
+  (void)fputs("Token: Newline\n", stream);
   emit_range(&token->location, 1, stream);
 }
 
@@ -206,6 +208,7 @@ static void emit_token_eof(token_t* token, FILE* stream) {
   assert(stream != NULL);
   assert(token->kind == TOKEN_EOF);
 
-  fputs("Token: EOF\n", stream);
+  (void)fputs("Token: EOF\n", stream);
   emit_range(&token->location, 1, stream);
 }
+ 

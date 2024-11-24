@@ -2,6 +2,7 @@
 #define VARIABLE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <ti-basic-plus-plus/lexer/keyword.h>
 
 typedef enum variable_type {
@@ -21,11 +22,11 @@ variable_type_t keyword_to_variable_type(keyword_kind_t kind);
 
 typedef struct variable {
   variable_type_t type;
-  char id;
+  union {
+    char letter;
+    uint8_t index;
+  } id;
 } variable_t;
 
-bool match_variable(const char* string,
-                    size_t length,
-                    variable_t* var);
-
 #endif  // VARIABLE_H
+

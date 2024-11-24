@@ -35,3 +35,10 @@ DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_TOKEN, "unexpected %s")
 DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_PUNCTUATOR, "unexpected punctuator '%s'")
 DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_KEYWORD, "unexpected keyword '%s'")
 
+DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_TOKEN_EXPECTED, "unexpected %s, expected %s")
+DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_PUNCTUATOR_EXPECTED, "unexpected punctuator '%s', expected '%s'")
+DIAG_LOCATION(FATAL_ERROR, UNEXPECTED_KEYWORD_EXPECTED, "unexpected keyword '%s', expected '%s'")
+
+DIAG_LOCATION(FATAL_ERROR, INVALID_MATRIX_VARIABLE_NAME, "invalid matrix variable name, must be [A-J]")
+DIAG_LOCATION(FATAL_ERROR, INVALID_VARIABLE_NAME, "invalid variable name '%.*s'")
+
