@@ -101,6 +101,20 @@ ast_node_t* ast_node_create_variable_reservation(variable_t variable,
                                                  source_range_t location,
                                                  source_range_t error_location);
 
+ast_node_t* ast_node_create_variable_decl(variable_type_t type,
+                                          const char* name,
+                                          ast_node_t* expr,
+                                          bool is_constant,
+                                          source_range_t location,
+                                          source_range_t error_location);
+
+ast_node_t* ast_node_create_function_decl(variable_type_t return_type,
+                                          const char* name,
+                                          ast_node_t** parameters,
+                                          ast_node_t* body,
+                                          source_range_t location,
+                                          source_range_t error_location);
+
 void emit_ast(ast_node_t* root, FILE* stream);
 
 #endif  // AST_NODE_H

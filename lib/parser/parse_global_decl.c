@@ -59,27 +59,27 @@ static ast_node_t* parse_variable_or_function_decl(token_t** start,
   assert(*start != NULL);
   assert(d != NULL);
 
-  token_t** t = start;
+  token_t* t = *start;
 
   // <type>
 
-  (void)token_next(t);
+  t = t->next;
 
   // <identifier>
 
-  if (compare_token(*t, 1, TOKEN_IDENTIFIER) != TOKEN_IDENTIFIER) {
-    unexpected_token(*t, TOKEN_IDENTIFIER, d);
+  if (compare_token(t, 1, TOKEN_IDENTIFIER) != TOKEN_IDENTIFIER) {
+    unexpected_token(t, TOKEN_IDENTIFIER, d);
     return NULL;
   }
 
-  (void)token_next(t);
+  t = t->next;
 
   // (, :, =
 
   punctuator_kind_t punct =
-      compare_punctuator(*t, 3, PUNCT_LPAREN, PUNCT_COLON, PUNCT_ASGN);
+      compare_punctuator(t, 3, PUNCT_LPAREN, PUNCT_COLON, PUNCT_ASGN);
   if (punct == PUNCT_UNKNOWN) {
-    unexpected_token(*t, TOKEN_PUNCTUATOR, d);
+    unexpected_token(t, TOKEN_PUNCTUATOR, d);
     return NULL;
   }
 
