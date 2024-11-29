@@ -36,8 +36,10 @@ variable_t parse_calculator_variable(token_t** t, diagnostics_t* d) {
       return parse_var_string(t, d);
   }
 
-  diag_report_source(d, &(*t)->location, FATAL_ERROR_INVALID_VARIABLE_NAME,
-                     id_length, (*t)->data.string);
+  diag_report_source(d, &(*t)->location, ERROR_INVALID_VARIABLE_NAME, id_length,
+                     (*t)->data.string);
+
+  (void)token_next(t);
 
   return (variable_t){.type = VAR_UNKNOWN};
 }
@@ -64,10 +66,11 @@ static variable_t parse_var_matrix(token_t** t, diagnostics_t* d) {
 
   char letter;
 
+  bool failed = false;
   if (id_length != 1 || (letter = id[0], (letter < 'A' || letter > 'J'))) {
-    diag_report_source(d, &(*t)->location,
-                       FATAL_ERROR_INVALID_MATRIX_VARIABLE_NAME, id_length, id);
-    return (variable_t){.type = VAR_UNKNOWN};
+    diag_report_source(d, &(*t)->location, ERROR_INVALID_MATRIX_VARIABLE_NAME,
+                       id_length, id);
+    failed = true;
   }
 
   (void)token_next(t);
@@ -80,6 +83,10 @@ static variable_t parse_var_matrix(token_t** t, diagnostics_t* d) {
   }
 
   (void)token_next(t);
+
+  if (failed) {
+    return (variable_t){.type = VAR_UNKNOWN};
+  }
 
   return (variable_t){.type = VAR_MATRIX, .id.letter = letter};
 }
@@ -98,8 +105,9 @@ static variable_t parse_var_number(token_t** t, diagnostics_t* d) {
   char letter;
 
   if (id_length != 1 || (letter = id_string[0], letter < 'A' || letter > 'Z')) {
-    diag_report_source(d, &(*t)->location, FATAL_ERROR_INVALID_VARIABLE_NAME,
+    diag_report_source(d, &(*t)->location, ERROR_INVALID_VARIABLE_NAME,
                        id_length, id_string);
+    (void)token_next(t);
     return (variable_t){.type = VAR_UNKNOWN};
   }
 
@@ -120,8 +128,9 @@ static variable_t parse_var_theta(token_t** t, diagnostics_t* d) {
   size_t id_length = arrlenu(id_string);
 
   if (id_length != 5 || strncmp(id_string, "Theta", 5) != 0) {
-    diag_report_source(d, &(*t)->location, FATAL_ERROR_INVALID_VARIABLE_NAME,
+    diag_report_source(d, &(*t)->location, ERROR_INVALID_VARIABLE_NAME,
                        id_length, id_string);
+    (void)token_next(t);
     return (variable_t){.type = VAR_UNKNOWN};
   }
 
@@ -145,8 +154,9 @@ static variable_t parse_var_string(token_t** t, diagnostics_t* d) {
 
   if (id_length != 4 || memcmp(id_string, "Str", 3) != 0 ||
       (id = id_string[3], id < '0' || id > '9')) {
-    diag_report_source(d, &(*t)->location, FATAL_ERROR_INVALID_VARIABLE_NAME,
+    diag_report_source(d, &(*t)->location, ERROR_INVALID_VARIABLE_NAME,
                        id_length, id_string);
+    (void)token_next(t);
     return (variable_t){.type = VAR_UNKNOWN};
   }
 
@@ -170,8 +180,9 @@ static variable_t parse_var_list(token_t** t, diagnostics_t* d) {
 
   if (id_length != 2 || id_string[0] != 'L' ||
       (id = id_string[1], id < '1' || id > '6')) {
-    diag_report_source(d, &(*t)->location, FATAL_ERROR_INVALID_VARIABLE_NAME,
+    diag_report_source(d, &(*t)->location, ERROR_INVALID_VARIABLE_NAME,
                        id_length, id_string);
+    (void)token_next(t);
     return (variable_t){.type = VAR_UNKNOWN};
   }
 

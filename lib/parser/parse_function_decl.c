@@ -57,19 +57,32 @@ ast_node_t* parse_function_decl(token_t** t, diagnostics_t* d) {
     return NULL;
   }
 
-  source_range_t end_location = (*t)->location;
-
   (void)token_next(t);
 
-  // TODO: Body
+  // Newline
 
-  // TODO: Newline
+  while ((*t)->kind == TOKEN_NEWLINE) {
+    (void)token_next(t);
+  }
 
+  // {
+
+  if (compare_punctuator(*t, 1, PUNCT_LBRACE) != PUNCT_LBRACE) {
+    unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "'{'", d);
+    return NULL;
+  }
+
+  ast_node_t* body = parse_statement_block(t, d);
+  if (should_exit(d)) {
+    return NULL;
+  }
+
+  source_range_t end_location = (*t)->prev->location;
   source_range_t location = range_cat(&start_location, &end_location);
 
   return ast_node_create_function_decl(keyword_to_variable_type(keyword_kind),
-                                       identifier, parameters, NULL,
-                                       location, identifier_location);
+                                       identifier, parameters, body, location,
+                                       identifier_location);
 }
 
 static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
@@ -81,7 +94,7 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
 
   token_kind_t token = compare_token(*t, 2, TOKEN_KEYWORD, TOKEN_PUNCTUATOR);
 
-  const char* expected_type_or_rparen_str = "parameter type or )";
+  const char* expected_type_or_rparen_str = "parameter type or ')'";
   const char* expected_type_str = "parameter type";
 
   const char* expected_str = expected_type_or_rparen_str;
@@ -105,7 +118,7 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
           compare_punctuator(*t, 2, PUNCT_RPAREN, PUNCT_COMMA);
       expected_str = expected_type_or_rparen_str;
       if (punct == PUNCT_UNKNOWN) {
-        unexpected_token_expected(*t, TOKEN_PUNCTUATOR, ") or ,", d);
+        unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "')' or ','", d);
         goto CLEANUP;
       } else if (punct == PUNCT_COMMA) {
         (void)token_next(t);
@@ -117,8 +130,8 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
     } else if (token == TOKEN_PUNCTUATOR) {
       punctuator_kind_t punct = compare_punctuator(*t, 1, PUNCT_RPAREN);
       if (punct == PUNCT_UNKNOWN) {
-        unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "parameter type or )",
-                                  d);
+        unexpected_token_expected(*t, TOKEN_PUNCTUATOR,
+                                  expected_type_or_rparen_str, d);
         return NULL;
       }
 
@@ -174,4 +187,4 @@ static ast_node_t* parse_parameter(token_t** t, diagnostics_t* d) {
 
   return parameter;
 }
- 
+

@@ -319,7 +319,6 @@ static void emit_code(FILE* stream, source_range_t* range) {
 
   char* line = if_get_line(range->file, range->begin.line);
   if (line == NULL) {
-    assert(false);
     return;
   }
   const size_t line_length = strlen(line);

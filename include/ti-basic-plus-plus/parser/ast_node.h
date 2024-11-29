@@ -14,7 +14,7 @@ typedef enum {
   AST_FUNCTION_DECL,
   AST_VARIABLE_DECL,
   AST_STATEMENT,
-  AST_BLOCK,
+  AST_STATEMENT_BLOCK,
   AST_VARIABLE_RESERVATION,
   AST_PARAMETER,
 
@@ -46,8 +46,8 @@ typedef struct ast_variable_decl_metadata {
 typedef struct ast_function_decl_data {
   variable_type_t return_type;
   const char* name;
-  struct ast_node** parameters;
-  struct ast_node* body;
+  struct ast_node** parameters; // [VARIABLE_DECL]
+  struct ast_node* body; // STATEMENT_BLOCK
 } ast_function_decl_data_t;
 
 typedef struct ast_function_call_data {

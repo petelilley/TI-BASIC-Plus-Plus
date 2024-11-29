@@ -26,7 +26,6 @@ ast_node_t* ast_node_create_variable_reservation(
     variable_t variable,
     source_range_t location,
     source_range_t error_location) {
-  assert(variable.type != VAR_UNKNOWN);
 
   ast_node_t* node = ast_node_create(AST_VARIABLE_RESERVATION);
   node->location = location;

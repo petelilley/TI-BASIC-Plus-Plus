@@ -5,8 +5,6 @@
 static ast_node_t* parse_variable_or_function_decl(token_t** t,
                                                    diagnostics_t* d);
 
-static ast_node_t* parse_reserve_decl(token_t** t, diagnostics_t* d);
-
 ast_node_t* parse_global_decl(token_t** t, diagnostics_t* d) {
   assert(t != NULL);
   assert(*t != NULL);
@@ -90,7 +88,7 @@ static ast_node_t* parse_variable_or_function_decl(token_t** start,
   return parse_variable_decl(start, d);
 }
 
-static ast_node_t* parse_reserve_decl(token_t** t, diagnostics_t* d) {
+ast_node_t* parse_reserve_decl(token_t** t, diagnostics_t* d) {
   assert(t != NULL);
   assert(*t != NULL);
   assert(d != NULL);
@@ -111,9 +109,6 @@ static ast_node_t* parse_reserve_decl(token_t** t, diagnostics_t* d) {
   // <variable>
 
   variable_t variable = parse_calculator_variable(t, d);
-  if (variable.type == VAR_UNKNOWN) {
-    return NULL;
-  }
 
   source_range_t end_location = (*t)->prev->location;
 

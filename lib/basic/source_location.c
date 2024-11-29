@@ -54,9 +54,14 @@ source_range_t range_cat(source_range_t* begin, source_range_t* end) {
   assert(range_is_valid(end));
 
   assert(begin->file == end->file);
+
+  if (are_positions_equal(&begin->begin, &end->begin) &&
+      are_positions_equal(&begin->end, &end->end)) {
+    return *begin;
+  }
+
   assert(begin->end.line < end->begin.line ||
-         (begin->end.line == end->begin.line &&
-          begin->end.column <= end->begin.column));
+         (begin->end.line == end->begin.line && begin->end.column <= end->begin.column));
 
   source_range_t result = *begin;
   result.end = end->end;

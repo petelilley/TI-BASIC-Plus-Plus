@@ -8,11 +8,14 @@
 #include <ti-basic-plus-plus/parser/parser_utils.h>
 
 ast_node_t* parse_global_decl(token_t** t, diagnostics_t* d);
+ast_node_t* parse_reserve_decl(token_t** t, diagnostics_t* d);
 
 ast_node_t* parse_function_decl(token_t** t, diagnostics_t* d);
 ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d);
 
 variable_t parse_calculator_variable(token_t** t, diagnostics_t* d);
+
+ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d);
 
 #endif  // PARSER_INTERNAL_H
 

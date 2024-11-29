@@ -16,6 +16,10 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d) {
     return NULL;
   }
 
+  if (keyword_kind == KW_VOID) {
+    diag_report_source(d, &start_location, ERROR_VOID_VARIABLE_DECLARATION);
+  }
+
   (void)token_next(t);
 
   // <identifier>
