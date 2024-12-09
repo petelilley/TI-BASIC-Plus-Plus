@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <ti-basic-plus-plus/lexer/keyword.h>
 
 typedef enum variable_type {
@@ -19,14 +20,21 @@ typedef enum variable_type {
 } variable_type_t;
 
 variable_type_t keyword_to_variable_type(keyword_kind_t kind);
+const char* variable_type_to_string(variable_type_t type);
 
 typedef struct variable {
   variable_type_t type;
+
   union {
     char letter;
     uint8_t index;
   } id;
+
+  // For matrix/list elements.
+  int index_x, index_y;
 } variable_t;
+
+void emit_variable(const variable_t* variable, size_t indent_num, FILE* stream);
 
 #endif  // VARIABLE_H
 

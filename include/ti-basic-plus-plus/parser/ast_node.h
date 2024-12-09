@@ -11,12 +11,10 @@
 
 typedef enum {
   AST_ROOT,
-  AST_FUNCTION_DECL,
   AST_VARIABLE_DECL,
-  AST_STATEMENT,
+  AST_FUNCTION_DECL,
   AST_STATEMENT_BLOCK,
   AST_VARIABLE_RESERVATION,
-  AST_PARAMETER,
 
   AST_BINARY_EXPRESSION,
   AST_UNARY_EXPRESSION,
@@ -46,8 +44,8 @@ typedef struct ast_variable_decl_metadata {
 typedef struct ast_function_decl_data {
   variable_type_t return_type;
   const char* name;
-  struct ast_node** parameters; // [VARIABLE_DECL]
-  struct ast_node* body; // STATEMENT_BLOCK
+  struct ast_node** parameters;  // [VARIABLE_DECL]
+  struct ast_node* body;         // STATEMENT_BLOCK
 } ast_function_decl_data_t;
 
 typedef struct ast_function_call_data {
@@ -114,6 +112,15 @@ ast_node_t* ast_node_create_function_decl(variable_type_t return_type,
                                           ast_node_t* body,
                                           source_range_t location,
                                           source_range_t error_location);
+
+ast_node_t* ast_node_create_unary_expr(operator_kind_t operator,
+                                       ast_node_t * operand,
+                                       source_range_t location);
+
+ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
+                                        operator_kind_t operator,
+                                        ast_node_t * rhs,
+                                        source_range_t location);
 
 void emit_ast(ast_node_t* root, FILE* stream);
 

@@ -68,9 +68,12 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d) {
 
   // <expression>
 
-  // TODO: Implement
+  ast_node_t* expr = parse_expression(t, d);
+  if (expr == NULL) {
+    return NULL;
+  }
 
-  // Just newline for now
+  // Newline
 
   if (compare_token(*t, 1, TOKEN_NEWLINE) != TOKEN_NEWLINE) {
     unexpected_token_expected(*t, TOKEN_NEWLINE, "newline", d);
@@ -84,7 +87,7 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d) {
   source_range_t location = range_cat(&start_location, &end_location);
 
   return ast_node_create_variable_decl(keyword_to_variable_type(keyword_kind),
-                                       identifier, NULL, false, location,
+                                       identifier, expr, false, location,
                                        identifier_location);
 }
 
