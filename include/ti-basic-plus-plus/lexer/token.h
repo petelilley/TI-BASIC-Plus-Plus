@@ -41,8 +41,10 @@ token_t* token_create(token_kind_t kind, source_range_t location);
 // Frees an entire linked list of tokens.
 void token_list_destroy(token_t* head);
 
+#if 0
 // Emits a token with debug information to the given stream.
 void emit_token(token_t* token, FILE* stream);
 void emit_token_list(token_t* head, FILE* stream);
+#endif
 
 #endif // TOKEN_H

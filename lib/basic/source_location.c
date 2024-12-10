@@ -1,5 +1,6 @@
 #include <ti-basic-plus-plus/basic/source_location.h>
 
+#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 #include <ti-basic-plus-plus/basic/input_file.h>
 
 bool range_is_valid(const source_range_t* range) {
@@ -69,21 +70,11 @@ source_range_t range_cat(source_range_t* begin, source_range_t* end) {
   return result;
 }
 
-void emit_range(source_range_t* range, size_t indent_num, FILE* stream) {
+void range_emit(source_range_t* range, size_t indent_size, unsigned indents, FILE* stream) {
   assert(range != NULL);
   assert(stream != NULL);
 
-  if (!range_is_valid(range)) {
-    (void)fprintf(stream, "Invalid range\n");
-    return;
-  }
-
-  for (size_t i = 0; i < indent_num; ++i) {
-    (void)fputc('\t', stream);
-  }
-
-  (void)fprintf(stream, "Location: %s:%zu:%zu-%zu:%zu\n", range->file->path,
-                range->begin.line, range->begin.column, range->end.line,
-                range->end.column);
+  emit_tree_element_fmt(stream, indent_size, indents, "location", "%s:%zu:%zu-%zu:%zu",
+                        range->file->path, range->begin.line, range->begin.column,
+                        range->end.line, range->end.column);
 }
-

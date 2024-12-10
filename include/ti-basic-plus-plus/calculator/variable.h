@@ -34,7 +34,10 @@ typedef struct variable {
   int index_x, index_y;
 } variable_t;
 
-void emit_variable(const variable_t* variable, size_t indent_num, FILE* stream);
+void variable_emit(variable_t* variable,
+                   size_t indent_size,
+                   unsigned indents,
+                   FILE* stream);
 
 #endif  // VARIABLE_H
 

@@ -1,4 +1,4 @@
-#include <ti-basic-plus-plus/parser/ast_node.h>
+#include <ti-basic-plus-plus/ast/ast_node.h>
 
 #include <ti-basic-plus-plus/macros.h>
 
@@ -22,6 +22,15 @@ void ast_node_destroy(ast_node_t* node) {
 
   arrfree(node->children);
   free(node);
+}
+
+ast_node_t* ast_node_create_root(input_file_t* input_file) {
+  assert(input_file != NULL);
+
+  ast_node_t* node = ast_node_create(AST_ROOT);
+  node->location.file = input_file;
+
+  return node;
 }
 
 ast_node_t* ast_node_create_variable_reservation(
@@ -107,6 +116,8 @@ ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
 
   return node;
 }
+
+#if 0
 
 static void emit_ast_internal(ast_node_t* node, FILE* stream, size_t depth);
 
@@ -389,3 +400,4 @@ static void emit_ast_internal(ast_node_t* node, FILE* stream, size_t depth) {
   }
 }
 
+#endif

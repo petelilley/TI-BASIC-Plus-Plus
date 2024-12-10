@@ -3,7 +3,7 @@
 
 #include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/lexer/token.h>
-#include <ti-basic-plus-plus/parser/ast_node.h>
+#include <ti-basic-plus-plus/ast/ast_node.h>
 
 token_kind_t compare_token(const token_t* t, size_t num_kinds, ...);
 punctuator_kind_t compare_punctuator(const token_t* t, size_t num_kinds, ...);

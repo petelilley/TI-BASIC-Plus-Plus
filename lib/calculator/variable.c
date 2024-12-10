@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <ti-basic-plus-plus/macros.h>
+#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 
 variable_type_t keyword_to_variable_type(keyword_kind_t kind) {
   switch (kind) {
@@ -23,7 +24,7 @@ variable_type_t keyword_to_variable_type(keyword_kind_t kind) {
 const char* variable_type_to_string(variable_type_t type) {
   switch (type) {
     case VAR_VOID:
-      return "Void";
+      return "void";
     case VAR_NUMBER:
       return "Number";
     case VAR_STRING:
@@ -41,41 +42,44 @@ const char* variable_type_to_string(variable_type_t type) {
   }
 }
 
-void emit_variable(const variable_t* variable,
-                   size_t indent_num,
+void variable_emit(variable_t* variable,
+                   size_t indent_size,
+                   unsigned indents,
                    FILE* stream) {
   assert(variable != NULL);
   assert(stream != NULL);
 
-  for (size_t i = 0; i < indent_num; ++i) {
-    (void)fputc('\t', stream);
-  }
-
-  fputs("Variable: ", stream);
-
   switch (variable->type) {
     case VAR_UNKNOWN:
     case VAR_VOID:
-      fputs("Unknown\n", stream);
+
+      emit_tree_element_fmt(stream, indent_size, indents, "variable",
+                            "unknown");
       return;
     case VAR_NUMBER:
-      fprintf(stream, "%c\n", variable->id.letter);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable", "%c",
+                            variable->id.letter);
       return;
     case VAR_STRING:
-      fprintf(stream, "Str%d\n", variable->id.index);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable", "Str%d",
+                            variable->id.index);
       return;
     case VAR_MATRIX:
-      fprintf(stream, "[%c]\n", variable->id.letter);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable", "[%c]",
+                            variable->id.letter);
       return;
     case VAR_LIST:
-      fprintf(stream, "L%d\n", variable->id.index);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable", "L%d",
+                            variable->id.index);
       return;
     case VAR_MATRIX_ELEMENT:
-      fprintf(stream, "[%c](%d, %d)\n", variable->id.letter, variable->index_x,
-              variable->index_y);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable",
+                            "[%c](%d, %d)", variable->id.letter,
+                            variable->index_x, variable->index_y);
       return;
     case VAR_LIST_ELEMENT:
-      fprintf(stream, "L%d(%d)\n", variable->id.index, variable->index_x);
+      emit_tree_element_fmt(stream, indent_size, indents, "variable", "L%d(%d)",
+                            variable->id.index, variable->index_x);
       return;
     default:
       UNREACHABLE();

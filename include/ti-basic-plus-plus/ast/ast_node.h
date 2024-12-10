@@ -3,6 +3,7 @@
 
 #include <stb_ds.h>
 #include <stdio.h>
+#include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/basic/source_location.h>
 #include <ti-basic-plus-plus/calculator/builtin_constant.h>
 #include <ti-basic-plus-plus/calculator/builtin_function.h>
@@ -95,6 +96,8 @@ typedef struct ast_node {
 ast_node_t* ast_node_create(ast_node_kind_t kind);
 void ast_node_destroy(ast_node_t* node);
 
+ast_node_t* ast_node_create_root(input_file_t* input_file);
+
 ast_node_t* ast_node_create_variable_reservation(variable_t variable,
                                                  source_range_t location,
                                                  source_range_t error_location);
@@ -122,7 +125,8 @@ ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
                                         ast_node_t * rhs,
                                         source_range_t location);
 
-void emit_ast(ast_node_t* root, FILE* stream);
+// Emits the AST node to the given stream.
+void ast_node_emit(ast_node_t* node, FILE* stream);
 
 #endif  // AST_NODE_H
 

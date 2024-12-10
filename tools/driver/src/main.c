@@ -2,7 +2,7 @@
 
 #include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/lexer/lexer.h>
-#include <ti-basic-plus-plus/parser/ast_node.h>
+#include <ti-basic-plus-plus/ast/ast_node.h>
 #include <ti-basic-plus-plus/parser/parser.h>
 
 static diagnostics_t d;
@@ -51,7 +51,7 @@ static void compile(void) {
     }
 
     if (driver_config.dump_tokens) {
-      emit_token_list(head_token, stdout);
+      /* emit_token_list(head_token, stdout); */
     }
 
     ast_root = parse_tokens(head_token, &d);
@@ -60,7 +60,8 @@ static void compile(void) {
     }
 
     if (driver_config.dump_ast) {
-      emit_ast(ast_root, stdout);
+      /* emit_ast(ast_root, stdout); */
+      ast_node_emit(ast_root, stdout);
     }
 
     // TODO: Semantic analysis, code generation

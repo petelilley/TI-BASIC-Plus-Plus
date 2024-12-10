@@ -66,6 +66,8 @@ void token_list_destroy(token_t* head) {
   }
 }
 
+#if 0
+
 static void emit_token_unknown(token_t* token, FILE* stream);
 static void emit_token_identifier(token_t* token, FILE* stream);
 static void emit_token_keyword(token_t* token, FILE* stream);
@@ -212,3 +214,4 @@ static void emit_token_eof(token_t* token, FILE* stream) {
   emit_range(&token->location, 1, stream);
 }
  
+#endif

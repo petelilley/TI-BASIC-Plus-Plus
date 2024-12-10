@@ -6,7 +6,7 @@ ast_node_t* parse_tokens(token_t* head_token, diagnostics_t* d) {
   assert(head_token != NULL);
   assert(d != NULL);
 
-  ast_node_t* root = ast_node_create(AST_ROOT);
+  ast_node_t* root = ast_node_create_root(head_token->location.file);
 
   while (head_token != NULL && head_token->kind != TOKEN_EOF &&
          !should_exit(d)) {
