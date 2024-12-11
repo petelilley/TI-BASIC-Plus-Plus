@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 
 struct input_file;
 struct input_file_iterator;
@@ -46,7 +47,10 @@ source_range_t range_at_current(struct input_file_iterator* file);
 // Concatenate two source ranges.
 source_range_t range_cat(source_range_t* begin, source_range_t* end);
 
-void range_emit(source_range_t* range, size_t indent_size, unsigned indents, FILE* stream);
+void range_emit(source_range_t* range,
+                size_t indent_size,
+                emit_tree_indent_data_t* indent,
+                struct diagnostics* d);
 
 #endif  // SOURCE_LOCATION_H
 

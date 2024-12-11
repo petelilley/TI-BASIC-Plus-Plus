@@ -60,8 +60,7 @@ static void compile(void) {
     }
 
     if (driver_config.dump_ast) {
-      /* emit_ast(ast_root, stdout); */
-      ast_node_emit(ast_root, stdout);
+      ast_node_emit(ast_root, &d);
     }
 
     // TODO: Semantic analysis, code generation

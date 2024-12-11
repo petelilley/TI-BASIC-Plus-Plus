@@ -1,8 +1,8 @@
 #include <ti-basic-plus-plus/calculator/variable.h>
 
 #include <assert.h>
+#include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/macros.h>
-#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 
 variable_type_t keyword_to_variable_type(keyword_kind_t kind) {
   switch (kind) {
@@ -44,41 +44,40 @@ const char* variable_type_to_string(variable_type_t type) {
 
 void variable_emit(variable_t* variable,
                    size_t indent_size,
-                   unsigned indents,
-                   FILE* stream) {
+                   emit_tree_indent_data_t* indent,
+                   diagnostics_t* d) {
   assert(variable != NULL);
-  assert(stream != NULL);
+  assert(d != NULL);
 
   switch (variable->type) {
     case VAR_UNKNOWN:
     case VAR_VOID:
 
-      emit_tree_element_fmt(stream, indent_size, indents, "variable",
-                            "unknown");
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "unknown");
       return;
     case VAR_NUMBER:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable", "%c",
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "%c",
                             variable->id.letter);
       return;
     case VAR_STRING:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable", "Str%d",
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "Str%d",
                             variable->id.index);
       return;
     case VAR_MATRIX:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable", "[%c]",
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "[%c]",
                             variable->id.letter);
       return;
     case VAR_LIST:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable", "L%d",
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "L%d",
                             variable->id.index);
       return;
     case VAR_MATRIX_ELEMENT:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable",
-                            "[%c](%d, %d)", variable->id.letter,
-                            variable->index_x, variable->index_y);
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "[%c](%d, %d)",
+                            variable->id.letter, variable->index_x,
+                            variable->index_y);
       return;
     case VAR_LIST_ELEMENT:
-      emit_tree_element_fmt(stream, indent_size, indents, "variable", "L%d(%d)",
+      emit_tree_element_fmt(d, indent_size, indent, "variable", "L%d(%d)",
                             variable->id.index, variable->index_x);
       return;
     default:

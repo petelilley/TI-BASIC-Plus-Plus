@@ -1,6 +1,7 @@
 #include <ti-basic-plus-plus/basic/diagnostics.h>
 
 #include <ti-basic-plus-plus/basic/input_file.h>
+#include <ti-basic-plus-plus/os/terminal.h>
 
 #include <assert.h>
 #include <stdarg.h>
@@ -59,6 +60,7 @@ static void handle_error(diagnostics_t* d,
                          const char* file);
 
 static void emit_diagnostic(FILE* stream,
+                            bool colorize,
                             severity_t severity,
                             const char* file,
                             source_range_t* range,
@@ -66,6 +68,7 @@ static void emit_diagnostic(FILE* stream,
                             ...);
 
 static void emit_diagnostic_v(FILE* stream,
+                              bool colorize,
                               severity_t severity,
                               const char* file,
                               source_range_t* range,
@@ -73,17 +76,26 @@ static void emit_diagnostic_v(FILE* stream,
                               va_list args);
 
 static void emit_location(FILE* stream,
+                          bool colorize,
                           const char* file,
                           const source_range_t* range);
-static void emit_severity(FILE* stream, severity_t severity);
-static void emit_message(FILE* stream, const char* fmt, va_list args);
-static void emit_code(FILE* stream, source_range_t* range);
+static void emit_severity(FILE* stream, bool colorize, severity_t severity);
+static void emit_message(FILE* stream,
+                         bool colorize,
+                         const char* fmt,
+                         va_list args);
+static void emit_code(FILE* stream, bool colorize, source_range_t* range);
 
 void diagnostics_init(diagnostics_t* d) {
   assert(d != NULL);
 
   (void)memset(d, 0, sizeof(diagnostics_t));
   d->max_errors = 64;
+
+  d->out_stream = stdout;
+  d->err_stream = stderr;
+  d->out_colorize = is_tty(stdout);
+  d->err_colorize = is_tty(stderr);
 }
 
 diagnostics_t diagnostics_create(void) {
@@ -103,7 +115,8 @@ void diag_report(diagnostics_t* d, diagnostic_id_t id, ...) {
 
   va_list args;
   va_start(args, id);
-  emit_diagnostic_v(stderr, severity, NULL, NULL, DIAG_TEXTS[id], args);
+  emit_diagnostic_v(d->err_stream, d->err_colorize, severity, NULL, NULL,
+                    DIAG_TEXTS[id], args);
   va_end(args);
 
   if (severity >= SEVERITY_ERROR) {
@@ -126,7 +139,8 @@ void diag_report_file(diagnostics_t* d,
 
   va_list args;
   va_start(args, id);
-  emit_diagnostic_v(stderr, severity, file, NULL, DIAG_TEXTS[id], args);
+  emit_diagnostic_v(d->err_stream, d->err_colorize, severity, file, NULL,
+                    DIAG_TEXTS[id], args);
   va_end(args);
 
   if (severity >= SEVERITY_ERROR) {
@@ -151,7 +165,8 @@ void diag_report_source(diagnostics_t* d,
 
   va_list args;
   va_start(args, id);
-  emit_diagnostic_v(stderr, severity, file, range, DIAG_TEXTS[id], args);
+  emit_diagnostic_v(d->err_stream, d->err_colorize, severity, file, range,
+                    DIAG_TEXTS[id], args);
   va_end(args);
 
   if (severity >= SEVERITY_ERROR) {
@@ -202,12 +217,13 @@ static void handle_error(diagnostics_t* d,
   if (d->error_count >= d->max_errors) {
     d->should_exit = true;
 
-    emit_diagnostic(stderr, SEVERITY_FATAL_ERROR, file, NULL,
-                    "too many errors, stopping compilation");
+    emit_diagnostic(d->err_stream, d->err_colorize, SEVERITY_FATAL_ERROR, file,
+                    NULL, "too many errors, stopping compilation");
   }
 }
 
 static void emit_diagnostic(FILE* stream,
+                            bool colorize,
                             severity_t severity,
                             const char* file,
                             source_range_t* range,
@@ -216,12 +232,13 @@ static void emit_diagnostic(FILE* stream,
   va_list args;
   va_start(args, fmt);
 
-  emit_diagnostic_v(stream, severity, file, range, fmt, args);
+  emit_diagnostic_v(stream, colorize, severity, file, range, fmt, args);
 
   va_end(args);
 }
 
 static void emit_diagnostic_v(FILE* stream,
+                              bool colorize,
                               severity_t severity,
                               const char* file,
                               source_range_t* range,
@@ -233,31 +250,41 @@ static void emit_diagnostic_v(FILE* stream,
   assert(fmt != NULL);
 
   if (file != NULL) {
-    emit_location(stream, file, range);
+    emit_location(stream, colorize, file, range);
   }
-  emit_severity(stream, severity);
-  emit_message(stream, fmt, args);
+  emit_severity(stream, colorize, severity);
+  emit_message(stream, colorize, fmt, args);
 
   if (range != NULL) {
-    emit_code(stream, range);
+    emit_code(stream, colorize, range);
   }
 }
 
 static void emit_location(FILE* stream,
+                          bool colorize,
                           const char* file,
                           const source_range_t* range) {
   assert(stream != NULL);
   assert(file != NULL);
 
-  (void)fprintf(stream, "\033[0;1m%s:", file);
+  if (colorize) {
+    (void)fputs("\033[0;1m", stream);
+  }
+
+  (void)fprintf(stream, "%s:", file);
 
   if (range != NULL) {
     (void)fprintf(stream, "%zu:%zu:", range->begin.line, range->begin.column);
   }
-  (void)fprintf(stream, "\033[0m ");
+
+  if (colorize) {
+    (void)fprintf(stream, "\033[0m");
+  }
+
+  (void)fputc(' ', stream);
 }
 
-static void emit_severity(FILE* stream, severity_t severity) {
+static void emit_severity(FILE* stream, bool colorize, severity_t severity) {
   assert(stream != NULL);
   assert(severity != SEVERITY_SUPPRESS);
 
@@ -289,18 +316,30 @@ static void emit_severity(FILE* stream, severity_t severity) {
       return;
   }
 
-  (void)fprintf(stream, "\033[0;%sm", style);
+  if (colorize) {
+    (void)fprintf(stream, "\033[0;%sm", style);
+  }
   (void)fprintf(stream, "%s", text);
-  (void)fprintf(stream, "\033[0m");
+  if (colorize) {
+    (void)fprintf(stream, "\033[0m");
+  }
 }
 
-static void emit_message(FILE* stream, const char* fmt, va_list args) {
+static void emit_message(FILE* stream,
+                         bool colorize,
+                         const char* fmt,
+                         va_list args) {
   assert(stream != NULL);
   assert(fmt != NULL);
 
-  (void)fprintf(stream, "\033[0;1m");
+  if (colorize) {
+    (void)fprintf(stream, "\033[0;1m");
+  }
   (void)vfprintf(stream, fmt, args);
-  (void)fprintf(stream, "\033[0m\n");
+  if (colorize) {
+    (void)fprintf(stream, "\033[0m");
+  }
+  (void)fputc('\n', stream);
 }
 
 static size_t calculate_code_gutter_size(size_t line_number,
@@ -311,7 +350,7 @@ static void emit_code_gutter_with_line_number(FILE* stream,
                                               size_t gutter_size);
 static void emit_code_gutter_empty(FILE* stream, size_t gutter_size);
 
-static void emit_code(FILE* stream, source_range_t* range) {
+static void emit_code(FILE* stream, bool colorize, source_range_t* range) {
   assert(stream != NULL);
   assert(range != NULL);
 
@@ -341,7 +380,9 @@ static void emit_code(FILE* stream, source_range_t* range) {
 
   emit_code_gutter_empty(stream, gutter_size);
 
-  (void)fputs("\033[0;1;32m", stream);
+  if (colorize) {
+    (void)fputs("\033[0;1;32m", stream);
+  }
   if (range->begin.column > 1) {
     (void)fprintf(stream, "%*s", (int)(range->begin.column - 1), " ");
   }
@@ -358,7 +399,10 @@ static void emit_code(FILE* stream, source_range_t* range) {
     (void)fputc('~', stream);
   }
 
-  (void)fputs("\033[0m\n", stream);
+  if (colorize) {
+    (void)fprintf(stream, "\033[0m");
+  }
+  (void)fputc('\n', stream);
 
   free(line);
 }

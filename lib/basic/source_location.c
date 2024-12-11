@@ -1,6 +1,6 @@
 #include <ti-basic-plus-plus/basic/source_location.h>
 
-#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
+#include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/basic/input_file.h>
 
 bool range_is_valid(const source_range_t* range) {
@@ -62,7 +62,8 @@ source_range_t range_cat(source_range_t* begin, source_range_t* end) {
   }
 
   assert(begin->end.line < end->begin.line ||
-         (begin->end.line == end->begin.line && begin->end.column <= end->begin.column));
+         (begin->end.line == end->begin.line &&
+          begin->end.column <= end->begin.column));
 
   source_range_t result = *begin;
   result.end = end->end;
@@ -70,11 +71,16 @@ source_range_t range_cat(source_range_t* begin, source_range_t* end) {
   return result;
 }
 
-void range_emit(source_range_t* range, size_t indent_size, unsigned indents, FILE* stream) {
+void range_emit(source_range_t* range,
+                size_t indent_size,
+                emit_tree_indent_data_t* indent,
+                diagnostics_t* d) {
   assert(range != NULL);
-  assert(stream != NULL);
+  assert(d != NULL);
 
-  emit_tree_element_fmt(stream, indent_size, indents, "location", "%s:%zu:%zu-%zu:%zu",
-                        range->file->path, range->begin.line, range->begin.column,
-                        range->end.line, range->end.column);
+  emit_tree_element_fmt(d, indent_size, indent, "location",
+                        "%s:%zu:%zu-%zu:%zu", range->file->path,
+                        range->begin.line, range->begin.column, range->end.line,
+                        range->end.column);
 }
+

@@ -1,5 +1,6 @@
 DIAG(FATAL_ERROR, OPTION_INVALID, "invalid option '%s'")
 DIAG(FATAL_ERROR, OPTION_MISSING_VALUE, "missing value for option '%s'")
+DIAG(FATAL_ERROR, OPTION_INVALID_VALUE, "invalid value '%s' for option '-%s'")
 DIAG(FATAL_ERROR, NO_INPUT_FILE, "no input file given")
 DIAG(FATAL_ERROR, MULTIPLE_INPUT_FILES, "multiple input files given")
 DIAG(FATAL_ERROR, OPTION_DUPLICATE, "duplicate option '-%s'")

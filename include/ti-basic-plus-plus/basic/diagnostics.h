@@ -17,7 +17,7 @@ typedef enum {
 #undef DIAG_LOCATION
 } diagnostic_id_t;
 
-typedef struct {
+typedef struct diagnostics {
   size_t max_errors;
 
   size_t error_count;
@@ -26,6 +26,11 @@ typedef struct {
   bool suppress_remarks;
   bool suppress_warnings;
   bool warnings_as_errors;
+
+  FILE* out_stream;
+  FILE* err_stream;
+  bool out_colorize;
+  bool err_colorize;
 } diagnostics_t;
 
 void diagnostics_init(diagnostics_t* d);

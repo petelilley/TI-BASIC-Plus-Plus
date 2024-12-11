@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <ti-basic-plus-plus/lexer/keyword.h>
+#include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 
 typedef enum variable_type {
   VAR_UNKNOWN = 0,
@@ -36,8 +37,8 @@ typedef struct variable {
 
 void variable_emit(variable_t* variable,
                    size_t indent_size,
-                   unsigned indents,
-                   FILE* stream);
+                   emit_tree_indent_data_t* indent,
+                   struct diagnostics* d);
 
 #endif  // VARIABLE_H
 

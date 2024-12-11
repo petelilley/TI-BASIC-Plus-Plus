@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/basic/source_location.h>
+#include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/calculator/builtin_constant.h>
 #include <ti-basic-plus-plus/calculator/builtin_function.h>
 #include <ti-basic-plus-plus/calculator/variable.h>
@@ -126,7 +127,7 @@ ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
                                         source_range_t location);
 
 // Emits the AST node to the given stream.
-void ast_node_emit(ast_node_t* node, FILE* stream);
+void ast_node_emit(ast_node_t* node, diagnostics_t* d);
 
 #endif  // AST_NODE_H
 

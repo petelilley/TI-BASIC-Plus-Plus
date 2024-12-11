@@ -12,15 +12,16 @@ driver_config_t driver_config;
 
 // clang-format off
 const option_t driver_options[] = {
-    {OPTION_HELP,                false,     NULL, {"h",           "help"}, "Print this help message, then exit"},
-    {OPTION_VERSION,             false,     NULL, {"version",       NULL}, "Print the compiler version, then exit"},
-    {OPTION_WARNINGS_AS_ERRORS,  false,     NULL, {"Werror",        NULL}, "Treat warnings as errors"},
-    {OPTION_OUTPUT,              true,  "<file>", {"o",             NULL}, "Write output to file"},
-    {OPTION_SEND_OUTPUT,         false,     NULL, {"s",           "send"}, "Send output program to calculator"},
-    {OPTION_VERBOSE,             false,     NULL, {"v",             NULL}, "Enable verbose output"},
-    {OPTION_SUPPRESS_WARNINGS,   false,     NULL, {"w",             NULL}, "Suppress warnings"},
-    {OPTION_DUMP_TOKENS,         false,     NULL, {"dump-tokens",   NULL}, "Emit parsed tokens"},
-    {OPTION_DUMP_AST,            false,     NULL, {"dump-ast",      NULL}, "Emit generated AST"},
+    {OPTION_HELP,                false,                  NULL, {"h",           "help"}, "Print this help message, then exit"},
+    {OPTION_VERSION,             false,                  NULL, {"version",       NULL}, "Print the compiler version, then exit"},
+    {OPTION_WARNINGS_AS_ERRORS,  false,                  NULL, {"Werror",        NULL}, "Treat warnings as errors"},
+    {OPTION_OUTPUT,              true,               "<file>", {"o",             NULL}, "Write output to file"},
+    {OPTION_SEND_OUTPUT,         false,                  NULL, {"s",           "send"}, "Send output program to calculator"},
+    {OPTION_VERBOSE,             false,                  NULL, {"v",             NULL}, "Enable verbose output"},
+    {OPTION_SUPPRESS_WARNINGS,   false,                  NULL, {"w",             NULL}, "Suppress warnings"},
+    {OPTION_DUMP_TOKENS,         false,                  NULL, {"dump-tokens",   NULL}, "Emit parsed tokens"},
+    {OPTION_DUMP_AST,            false,                  NULL, {"dump-ast",      NULL}, "Emit generated AST"},
+    {OPTION_COLOR,               true,  "<auto|always|never>", {"color",         NULL}, "Colorize output"},
 };
 // clang-format on
 
@@ -128,11 +129,27 @@ static void process_input_options(input_option_t* input_options,
       case OPTION_DUMP_AST:
         driver_config.dump_ast = true;
         break;
+      case OPTION_COLOR:
+        if (strcmp(value, "auto") == 0) {
+          driver_config.color = COLOR_AUTO;
+        } else if (strcmp(value, "always") == 0) {
+          d->out_colorize = d->err_colorize = true;
+          driver_config.color = COLOR_ALWAYS;
+        } else if (strcmp(value, "never") == 0) {
+          driver_config.color = COLOR_NEVER;
+          d->out_colorize = d->err_colorize = false;
+        } else {
+          diag_report(d, FATAL_ERROR_OPTION_INVALID_VALUE, value, "color");
+          return;
+        }
+        break;
       default:
         assert(false);
         return;
     }
   }
+
+  // Inputs
 
   size_t num_input_paths = arrlenu(input_paths);
   if (num_input_paths < 1) {
