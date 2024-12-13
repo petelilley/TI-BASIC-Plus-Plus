@@ -2,8 +2,8 @@
 #define TOKEN_H
 
 #include <ti-basic-plus-plus/basic/source_location.h>
-#include <ti-basic-plus-plus/lexer/punctuator.h>
 #include <ti-basic-plus-plus/lexer/keyword.h>
+#include <ti-basic-plus-plus/lexer/punctuator.h>
 
 typedef enum {
   TOKEN_UNKNOWN = 0,
@@ -27,7 +27,7 @@ typedef struct token {
   token_kind_t kind;
 
   union {
-    char* string; // stb_ds allocated
+    char* string;  // stb_ds allocated
     double number;
     keyword_kind_t keyword;
     punctuator_kind_t punctuator;
@@ -41,10 +41,7 @@ token_t* token_create(token_kind_t kind, source_range_t location);
 // Frees an entire linked list of tokens.
 void token_list_destroy(token_t* head);
 
-#if 0
-// Emits a token with debug information to the given stream.
-void emit_token(token_t* token, FILE* stream);
-void emit_token_list(token_t* head, FILE* stream);
-#endif
+void token_list_emit(token_t* head, struct diagnostics* d);
 
-#endif // TOKEN_H
+#endif  // TOKEN_H
+

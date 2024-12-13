@@ -3,7 +3,7 @@
 #include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/utils/emit_tree_utils.h>
 
-static void build_node(void* _node,
+static void build_node(ast_node_t* node,
                        size_t indent_size,
                        emit_tree_indent_data_t* indent,
                        bool last_node,
@@ -38,14 +38,13 @@ void ast_node_emit(ast_node_t* node, diagnostics_t* d) {
   build_node(node, 0, NULL, true, d);
 }
 
-static void build_node(void* _node,
+static void build_node(ast_node_t* node,
                        size_t indent_size,
                        emit_tree_indent_data_t* indent,
                        bool last_node,
                        diagnostics_t* d) {
-  assert(_node != NULL);
+  assert(node != NULL);
   assert(d != NULL);
-  ast_node_t* node = (ast_node_t*)_node;
 
   const char* tag = NULL;
   emit_tree_section_build_func_t* elements_func = NULL;

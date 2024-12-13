@@ -142,9 +142,15 @@ void emit_tree_element(diagnostics_t* d,
   begin_color(d, indent->colors[indent_size - 1]);
   fputs("│", d->out_stream);
   end_color(d);
-  fprintf(d->out_stream, "│ %s = ", element_name);
+  fprintf(d->out_stream, "│ %s", element_name);
 
-  element_build(data, d);
+  if (element_build != NULL) {
+    fprintf(d->out_stream, " = ");
+
+    element_build(data, d);
+  }
+
+  fputc('\n', d->out_stream);
 }
 
 void emit_tree_element_fmt(diagnostics_t* d,

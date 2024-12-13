@@ -51,7 +51,7 @@ static void compile(void) {
     }
 
     if (driver_config.dump_tokens) {
-      /* emit_token_list(head_token, stdout); */
+      token_list_emit(head_token, &d);
     }
 
     ast_root = parse_tokens(head_token, &d);
