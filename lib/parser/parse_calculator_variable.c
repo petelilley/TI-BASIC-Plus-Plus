@@ -47,7 +47,7 @@ variable_t parse_calculator_variable(token_t** t, diagnostics_t* d) {
 static variable_t parse_var_matrix(token_t** t, diagnostics_t* d) {
   // [
 
-  if (compare_punctuator(*t, 1, PUNCT_LBRACKET) != PUNCT_LBRACKET) {
+  if (compare_punctuator(*t, 1, '[') != '[') {
     unexpected_token(*t, TOKEN_PUNCTUATOR, d);
     return (variable_t){.type = VAR_UNKNOWN};
   }
@@ -77,8 +77,8 @@ static variable_t parse_var_matrix(token_t** t, diagnostics_t* d) {
 
   // ]
 
-  if (compare_punctuator(*t, 1, PUNCT_RBRACKET) != PUNCT_RBRACKET) {
-    unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "closing ]", d);
+  if (compare_punctuator(*t, 1, ']') != ']') {
+    unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "closing ']'", d);
     return (variable_t){.type = VAR_UNKNOWN};
   }
 

@@ -16,6 +16,7 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d);
 variable_t parse_calculator_variable(token_t** t, diagnostics_t* d);
 
 ast_node_t* parse_expression(token_t** t, diagnostics_t* d);
+ast_node_t* parse_function_call(token_t** t, diagnostics_t* d);
 
 ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d);
 ast_node_t* parse_if_statement(token_t** t, diagnostics_t* d);

@@ -36,7 +36,7 @@ ast_node_t* parse_function_decl(token_t** t, diagnostics_t* d) {
 
   // (
 
-  if (compare_punctuator(*t, 1, PUNCT_LPAREN) != PUNCT_LPAREN) {
+  if (compare_punctuator(*t, 1, '(') != '(') {
     unexpected_token(*t, TOKEN_PUNCTUATOR, d);
     return NULL;
   }
@@ -52,7 +52,7 @@ ast_node_t* parse_function_decl(token_t** t, diagnostics_t* d) {
 
   // )
 
-  if (compare_punctuator(*t, 1, PUNCT_RPAREN) != PUNCT_RPAREN) {
+  if (compare_punctuator(*t, 1, ')') != ')') {
     unexpected_token(*t, TOKEN_PUNCTUATOR, d);
     return NULL;
   }
@@ -67,7 +67,7 @@ ast_node_t* parse_function_decl(token_t** t, diagnostics_t* d) {
 
   // {
 
-  if (compare_punctuator(*t, 1, PUNCT_LBRACE) != PUNCT_LBRACE) {
+  if (compare_punctuator(*t, 1, '{') != '{') {
     unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "'{'", d);
     return NULL;
   }
@@ -115,12 +115,12 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
 
       token = TOKEN_PUNCTUATOR;
       punctuator_kind_t punct =
-          compare_punctuator(*t, 2, PUNCT_RPAREN, PUNCT_COMMA);
+          compare_punctuator(*t, 2, ')', ',');
       expected_str = expected_type_or_rparen_str;
       if (punct == PUNCT_UNKNOWN) {
         unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "')' or ','", d);
         goto CLEANUP;
-      } else if (punct == PUNCT_COMMA) {
+      } else if (punct == ',') {
         (void)token_next(t);
         token = compare_token(*t, 1, TOKEN_KEYWORD);
         expected_str = expected_type_str;
@@ -128,7 +128,7 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
 
       continue;
     } else if (token == TOKEN_PUNCTUATOR) {
-      punctuator_kind_t punct = compare_punctuator(*t, 1, PUNCT_RPAREN);
+      punctuator_kind_t punct = compare_punctuator(*t, 1, ')');
       if (punct == PUNCT_UNKNOWN) {
         unexpected_token_expected(*t, TOKEN_PUNCTUATOR,
                                   expected_type_or_rparen_str, d);
@@ -142,6 +142,10 @@ static ast_node_t** parse_parameter_list(token_t** t, diagnostics_t* d) {
   return parameters;
 
 CLEANUP:
+  for (size_t num = arrlenu(parameters), i = 0; i < num; ++i) {
+    ast_node_destroy(parameters[i]);
+  }
+
   arrfree(parameters);
   return NULL;
 }

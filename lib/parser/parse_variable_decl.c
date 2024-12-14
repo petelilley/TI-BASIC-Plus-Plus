@@ -37,14 +37,14 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d) {
 
   // :, =
 
-  punctuator_kind_t punct = compare_punctuator(*t, 2, PUNCT_COLON, PUNCT_ASGN);
+  punctuator_kind_t punct = compare_punctuator(*t, 2, ':', '=');
 
   if (punct == PUNCT_UNKNOWN) {
-    unexpected_token_expected(*t, TOKEN_PUNCTUATOR, ": or =", d);
+    unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "':' or '='", d);
     return NULL;
   }
 
-  if (punct == PUNCT_COLON) {
+  if (punct == ':') {
     (void)token_next(t);
 
     // <variable>
@@ -54,15 +54,15 @@ ast_node_t* parse_variable_decl(token_t** t, diagnostics_t* d) {
       return NULL;
     }
 
-    punct = compare_punctuator(*t, 1, PUNCT_ASGN);
+    punct = compare_punctuator(*t, 1, '=');
 
     if (punct == PUNCT_UNKNOWN) {
-      unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "=", d);
+      unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "'='", d);
       return NULL;
     }
   }
 
-  assert(punct == PUNCT_ASGN);
+  assert(punct == '=');
 
   (void)token_next(t);
 

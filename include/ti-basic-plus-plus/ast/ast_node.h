@@ -50,11 +50,6 @@ typedef struct ast_function_decl_data {
   struct ast_node* body;         // STATEMENT_BLOCK
 } ast_function_decl_data_t;
 
-typedef struct ast_function_call_data {
-  const char* name;
-  struct ast_node** arguments;
-} ast_function_call_data_t;
-
 typedef struct ast_function_call_metadata {
   bool is_builtin;
   builtin_function_t builtin_function;
@@ -84,7 +79,6 @@ typedef struct ast_node {
     double numeric_literal;
     const char* string_literal;
     operator_kind_t operator;
-    ast_function_call_data_t function_call;
   } data;
 
   union {
@@ -125,6 +119,11 @@ ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
                                         operator_kind_t operator,
                                         ast_node_t * rhs,
                                         source_range_t location);
+
+ast_node_t* ast_node_create_function_call(const char* name,
+                                          ast_node_t** arguments,
+                                          source_range_t location,
+                                          source_range_t error_location);
 
 // Emits the AST node to the given stream.
 void ast_node_emit(ast_node_t* node, diagnostics_t* d);

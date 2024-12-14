@@ -34,6 +34,10 @@ static emit_tree_section_build_func_t build_elements_identifier_expression;
 static emit_tree_section_build_func_t build_elements_numeric_literal;
 static emit_tree_section_build_func_t build_elements_string_literal;
 
+static emit_tree_section_build_func_t build_elements_function_call;
+static emit_tree_section_build_func_t build_children_function_call;
+static emit_tree_section_build_func_t build_children_function_arguments;
+
 void ast_node_emit(ast_node_t* node, diagnostics_t* d) {
   build_node(node, 0, NULL, true, d);
 }
@@ -59,7 +63,7 @@ static void build_node(ast_node_t* node,
       children_func = &build_children_root;
       break;
     case AST_VARIABLE_RESERVATION:
-      color = 33;  // yellow
+      color = 1;
       tag = "var_res";
       elements_func = &build_elements_variable_reservation;
       break;
@@ -75,7 +79,10 @@ static void build_node(ast_node_t* node,
       color = 34;  // blue
       tag = "func_decl";
       elements_func = &build_elements_function_declaration;
-      children_func = &build_children_function_declaration;
+      if (node->data.function_decl.body != NULL ||
+          node->data.function_decl.parameters != NULL) {
+        children_func = &build_children_function_declaration;
+      }
       break;
     case AST_STATEMENT_BLOCK:
       color = 35;  // magenta
@@ -84,31 +91,39 @@ static void build_node(ast_node_t* node,
       children_func = &build_children_statement_block;
       break;
     case AST_BINARY_EXPRESSION:
-      color = 36; // cyan
+      color = 36;  // cyan
       tag = "bin_expr";
       elements_func = &build_elements_binary_expression;
       children_func = &build_children_binary_expression;
       break;
     case AST_UNARY_EXPRESSION:
-      color = 36; // cyan
+      color = 36;  // cyan
       tag = "unary_expr";
       elements_func = &build_elements_unary_expression;
       children_func = &build_children_unary_expression;
       break;
     case AST_IDENTIFIER:
-      color = 1;
+      color = 33;  // yellow
       tag = "identifier";
       elements_func = &build_elements_identifier_expression;
       break;
     case AST_NUMERIC_LITERAL:
-      color = 1;
+      color = 33;  // yellow
       tag = "numeric_literal";
       elements_func = &build_elements_numeric_literal;
       break;
     case AST_STRING_LITERAL:
-      color = 1;
+      color = 33;  // yellow
       tag = "string_literal";
       elements_func = &build_elements_string_literal;
+      break;
+    case AST_FUNCTION_CALL:
+      color = 34;  // blue
+      tag = "func_call";
+      elements_func = &build_elements_function_call;
+      if (node->children != NULL) {
+        children_func = &build_children_function_call;
+      }
       break;
     default:
       break;
@@ -257,10 +272,17 @@ static void build_children_function_declaration(void* _node,
 
   assert(node->kind == AST_FUNCTION_DECL);
 
-  emit_tree_section(d, indent_size, indent, "parameters", 1, false, NULL,
-                    build_children_function_parameters, node);
+  ast_function_decl_data_t* data = &node->data.function_decl;
 
-  build_node(node->data.function_decl.body, indent_size, indent, true, d);
+  if (data->parameters != NULL) {
+    emit_tree_section(d, indent_size, indent, "parameters", 1,
+                      data->body == NULL, NULL,
+                      build_children_function_parameters, node);
+  }
+
+  if (data->body != NULL) {
+    build_node(data->body, indent_size, indent, true, d);
+  }
 }
 
 static void build_elements_statement_block(void* _node,
@@ -293,9 +315,9 @@ static void build_children_statement_block(void* _node,
 }
 
 static void build_elements_binary_expression(void* _node,
-                                           size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+                                             size_t indent_size,
+                                             emit_tree_indent_data_t* indent,
+                                             diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -308,9 +330,10 @@ static void build_elements_binary_expression(void* _node,
                         op_to_string(node->data.operator));
 }
 
-static void build_children_binary_expression(void* _node, size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+static void build_children_binary_expression(void* _node,
+                                             size_t indent_size,
+                                             emit_tree_indent_data_t* indent,
+                                             diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -322,9 +345,9 @@ static void build_children_binary_expression(void* _node, size_t indent_size,
 }
 
 static void build_elements_unary_expression(void* _node,
-                                           size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+                                            size_t indent_size,
+                                            emit_tree_indent_data_t* indent,
+                                            diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -337,9 +360,10 @@ static void build_elements_unary_expression(void* _node,
                         op_to_string(node->data.operator));
 }
 
-static void build_children_unary_expression(void* _node, size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+static void build_children_unary_expression(void* _node,
+                                            size_t indent_size,
+                                            emit_tree_indent_data_t* indent,
+                                            diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -349,10 +373,11 @@ static void build_children_unary_expression(void* _node, size_t indent_size,
   build_node(node->children[0], indent_size, indent, true, d);
 }
 
-static void build_elements_identifier_expression(void* _node,
-                                           size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+static void build_elements_identifier_expression(
+    void* _node,
+    size_t indent_size,
+    emit_tree_indent_data_t* indent,
+    diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -361,8 +386,10 @@ static void build_elements_identifier_expression(void* _node,
 
   range_emit(&node->location, indent_size, indent, d);
 
-  emit_tree_element_fmt(d, indent_size, indent, "identifier", "%s",
-                        node->data.identifier);
+  const char* identifier = node->data.identifier;
+
+  emit_tree_element_fmt(d, indent_size, indent, "identifier", "%.*s",
+                        (int)arrlen(identifier), identifier);
 }
 
 static void build_elements_numeric_literal(void* _node,
@@ -382,9 +409,9 @@ static void build_elements_numeric_literal(void* _node,
 }
 
 static void build_elements_string_literal(void* _node,
-                                           size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+                                          size_t indent_size,
+                                          emit_tree_indent_data_t* indent,
+                                          diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
@@ -393,6 +420,57 @@ static void build_elements_string_literal(void* _node,
 
   range_emit(&node->location, indent_size, indent, d);
 
-  emit_tree_element_fmt(d, indent_size, indent, "value", "\"%s\"",
-                        node->data.string_literal);
+  const char* string_literal = node->data.string_literal;
+
+  emit_tree_element_fmt(d, indent_size, indent, "value", "\"%.*s\"",
+                        (int)arrlen(string_literal), string_literal);
 }
+
+static void build_elements_function_call(void* _node,
+                                         size_t indent_size,
+                                         emit_tree_indent_data_t* indent,
+                                         diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_FUNCTION_CALL);
+
+  range_emit(&node->location, indent_size, indent, d);
+
+  const char* identifier = node->data.identifier;
+
+  emit_tree_element_fmt(d, indent_size, indent, "name", "%.*s",
+                        (int)arrlen(identifier), identifier);
+}
+
+static void build_children_function_call(void* _node,
+                                         size_t indent_size,
+                                         emit_tree_indent_data_t* indent,
+                                         diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_FUNCTION_CALL);
+
+  emit_tree_section(d, indent_size, indent, "arguments", 1, true, NULL,
+                    build_children_function_arguments, node);
+}
+
+static void build_children_function_arguments(void* _node,
+                                              size_t indent_size,
+                                              emit_tree_indent_data_t* indent,
+                                              diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_FUNCTION_CALL);
+
+  size_t num_args = arrlenu(node->children);
+  for (size_t i = 0; i < num_args; ++i) {
+    build_node(node->children[i], indent_size, indent, i == num_args - 1, d);
+  }
+}
+

@@ -98,7 +98,7 @@ token_t* tokenize_punctuator(input_file_iterator_t* it) {
     return NULL;
   }
 
-  if (kind > PUNCT_CMP_GT) {
+  if (kind >= PUNCT_ASGN_ADD) {
     (void)if_next(it);
   }
 

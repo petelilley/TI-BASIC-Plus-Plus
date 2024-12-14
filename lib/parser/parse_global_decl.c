@@ -75,13 +75,13 @@ static ast_node_t* parse_variable_or_function_decl(token_t** start,
   // (, :, =
 
   punctuator_kind_t punct =
-      compare_punctuator(t, 3, PUNCT_LPAREN, PUNCT_COLON, PUNCT_ASGN);
+      compare_punctuator(t, 3, '(', ':', '=');
   if (punct == PUNCT_UNKNOWN) {
     unexpected_token(t, TOKEN_PUNCTUATOR, d);
     return NULL;
   }
 
-  if (punct == PUNCT_LPAREN) {
+  if (punct == '(') {
     return parse_function_decl(start, d);
   }
 

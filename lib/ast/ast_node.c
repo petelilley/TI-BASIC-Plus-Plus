@@ -117,3 +117,17 @@ ast_node_t* ast_node_create_binary_expr(ast_node_t* lhs,
   return node;
 }
 
+ast_node_t* ast_node_create_function_call(const char* name,
+                                          ast_node_t** arguments,
+                                          source_range_t location,
+                                          source_range_t error_location) {
+  assert(name != NULL);
+
+  ast_node_t* node = ast_node_create(AST_FUNCTION_CALL);
+  node->location = location;
+  node->error_location = error_location;
+  node->data.identifier = name;
+  node->children = arguments;
+
+  return node;
+}

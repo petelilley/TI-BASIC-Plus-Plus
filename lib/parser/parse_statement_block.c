@@ -10,7 +10,7 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
 
   // {
 
-  if (compare_punctuator(*t, 1, PUNCT_LBRACE) != PUNCT_LBRACE) {
+  if (compare_punctuator(*t, 1, '{') != '{') {
     unexpected_token(*t, TOKEN_PUNCTUATOR, d);
     return NULL;
   }
@@ -75,10 +75,10 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
     else if (token == TOKEN_PUNCTUATOR) {
       punctuator_kind_t punct = (*t)->data.punctuator;
 
-      if (punct == PUNCT_RBRACE) {
+      if (punct == '}') {
         break;
       }
-      else if (punct == PUNCT_LBRACE) {
+      else if (punct == '{') {
         statement = parse_statement_block(t, d);
       }
       else {
@@ -103,7 +103,7 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
 
   // }
 
-  if (compare_punctuator(*t, 1, PUNCT_RBRACE) != PUNCT_RBRACE) {
+  if (compare_punctuator(*t, 1, '}') != '}') {
     unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "'}'", d);
     return NULL;
   }

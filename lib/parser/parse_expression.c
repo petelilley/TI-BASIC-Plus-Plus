@@ -78,14 +78,14 @@ static void parse_prefix_operators(token_t** t, operator_kind_t** ops) {
       continue;
     }
     punctuator_kind_t punct_kind =
-        compare_punctuator(*t, 2, PUNCT_ADD, PUNCT_SUB);
+        compare_punctuator(*t, 2, '+', '-');
     if (punct_kind == PUNCT_UNKNOWN) {
       break;
     }
     (void)token_next(t);
 
     operator_kind_t op = OP_POS;
-    if (punct_kind == PUNCT_SUB) {
+    if (punct_kind == '-') {
       op = OP_NEG;
     }
     arrput(*ops, op);
@@ -111,13 +111,16 @@ static ast_node_t* parse_unit(token_t** t, diagnostics_t* d) {
                     TOKEN_NUMBER_LITERAL, TOKEN_STRING_LITERAL);
 
   if (token_kind == TOKEN_UNKNOWN || (token_kind == TOKEN_PUNCTUATOR &&
-                                      (*t)->data.punctuator != PUNCT_LPAREN)) {
+                                      (*t)->data.punctuator != '(')) {
     unexpected_token_expected(*t, TOKEN_UNKNOWN, "expression", d);
     goto CLEANUP;
 
   } else if (token_kind == TOKEN_IDENTIFIER) {
-    if (compare_punctuator((*t)->next, 1, PUNCT_LPAREN) != PUNCT_UNKNOWN) {
-      // TODO: Parse function call.
+    if (compare_punctuator((*t)->next, 1, '(') != PUNCT_UNKNOWN) {
+      unit = parse_function_call(t, d);
+      if (unit == NULL) {
+        goto CLEANUP;
+      }
     } else {
       unit = ast_node_create(AST_IDENTIFIER);
       unit->data.identifier = (*t)->data.string;
@@ -144,8 +147,8 @@ static ast_node_t* parse_unit(token_t** t, diagnostics_t* d) {
     if (unit == NULL) {
       goto CLEANUP;
     }
-    if (compare_punctuator(*t, 1, PUNCT_RPAREN) == PUNCT_UNKNOWN) {
-      unexpected_token_expected(*t, TOKEN_PUNCTUATOR, ")", d);
+    if (compare_punctuator(*t, 1, ')') == PUNCT_UNKNOWN) {
+      unexpected_token_expected(*t, TOKEN_PUNCTUATOR, "')'", d);
       goto CLEANUP;
     }
 
@@ -171,14 +174,6 @@ CLEANUP:
   }
 
   return NULL;
-
-  ast_node_t* node = ast_node_create(AST_NUMERIC_LITERAL);
-  node->location = node->error_location = (*t)->location;
-  node->data.numeric_literal = (*t)->data.number;
-
-  (void)token_next(t);
-
-  return node;
 }
 
 static operator_kind_t parse_operator(token_t** t, diagnostics_t* d) {
@@ -192,14 +187,14 @@ static operator_kind_t parse_operator(token_t** t, diagnostics_t* d) {
     return op_from_keyword(op_kw);
   }
 
-  punctuator_kind_t op_punct;
-  if ((*t)->kind != TOKEN_PUNCTUATOR ||
-      (op_punct = (*t)->data.punctuator, op_punct < PUNCT_ADD)) {
+  operator_kind_t op;
+  if ((*t)->kind != TOKEN_PUNCTUATOR || 
+      (op = op_from_punctuator((*t)->data.punctuator), op == OP_UNKNOWN)) {
     return OP_UNKNOWN;
   }
 
   (void)token_next(t);
-  return op_from_punctuator(op_punct);
+  return op;
 }
 
 static ast_node_t* compose_expression(expr_fragment_t** fragments) {
