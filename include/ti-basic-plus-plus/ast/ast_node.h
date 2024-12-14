@@ -3,9 +3,9 @@
 
 #include <stb_ds.h>
 #include <stdio.h>
+#include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/basic/input_file.h>
 #include <ti-basic-plus-plus/basic/source_location.h>
-#include <ti-basic-plus-plus/basic/diagnostics.h>
 #include <ti-basic-plus-plus/calculator/builtin_constant.h>
 #include <ti-basic-plus-plus/calculator/builtin_function.h>
 #include <ti-basic-plus-plus/calculator/variable.h>
@@ -62,6 +62,13 @@ typedef struct ast_identifier_metadata {
   struct ast_node* variable_decl;
 } ast_identifier_metadata_t;
 
+typedef struct ast_if_statement_data {
+  struct ast_node* condition;
+  struct ast_node* body;
+  struct ast_node** elif_statements;
+  struct ast_node* else_statement;
+} ast_if_statement_data_t;
+
 typedef struct ast_node {
   ast_node_kind_t kind;
 
@@ -75,6 +82,7 @@ typedef struct ast_node {
     variable_t reserved_variable;
     ast_variable_decl_data_t variable_decl;
     ast_function_decl_data_t function_decl;
+    ast_if_statement_data_t if_statement;
     const char* identifier;
     double numeric_literal;
     const char* string_literal;
@@ -124,6 +132,16 @@ ast_node_t* ast_node_create_function_call(const char* name,
                                           ast_node_t** arguments,
                                           source_range_t location,
                                           source_range_t error_location);
+
+ast_node_t* ast_node_create_if_statement(ast_node_t* condition,
+                                         ast_node_t* body,
+                                         ast_node_t** elif_statements,
+                                         ast_node_t* else_statement,
+                                         source_range_t location);
+
+ast_node_t* ast_node_create_else_if_statement(ast_node_t* condition,
+                                              ast_node_t* body,
+                                              source_range_t location);
 
 // Emits the AST node to the given stream.
 void ast_node_emit(ast_node_t* node, diagnostics_t* d);

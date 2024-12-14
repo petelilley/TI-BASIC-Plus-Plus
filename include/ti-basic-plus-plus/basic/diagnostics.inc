@@ -47,3 +47,6 @@ DIAG_LOCATION(ERROR, VOID_VARIABLE_DECLARATION, "variable declaration cannot hav
 DIAG_LOCATION(FATAL_ERROR, ELIF_WITHOUT_IF, "elif without matching if")
 DIAG_LOCATION(FATAL_ERROR, ELSE_WITHOUT_IF, "else without matching if")
 DIAG_LOCATION(ERROR, RESERVE_NOT_GLOBAL, "reserve declarations are not allowed in function bodies")
+
+DIAG_LOCATION(WARNING, EMPTY_CONDITION_STATEMENT_BODY, "empty %s statement body")
+

@@ -131,3 +131,32 @@ ast_node_t* ast_node_create_function_call(const char* name,
 
   return node;
 }
+
+ast_node_t* ast_node_create_if_statement(ast_node_t* condition,
+                                         ast_node_t* body,
+                                         ast_node_t** elif_statements,
+                                         ast_node_t* else_statement,
+                                         source_range_t location) {
+  assert(condition != NULL);
+
+  ast_node_t* node = ast_node_create(AST_IF_STATEMENT);
+  node->location = node->error_location = location;
+  node->data.if_statement.condition = condition;
+  node->data.if_statement.body = body;
+  node->data.if_statement.elif_statements = elif_statements;
+  node->data.if_statement.else_statement = else_statement;
+
+  return node;
+}
+
+ast_node_t* ast_node_create_else_if_statement(ast_node_t* condition,
+                                              ast_node_t* body,
+                                              source_range_t location) {
+  ast_node_t* node = ast_node_create(AST_IF_STATEMENT);
+  node->location = node->error_location = location;
+  node->data.if_statement.condition = condition;
+  node->data.if_statement.body = body;
+
+  return node;
+}
+

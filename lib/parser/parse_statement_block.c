@@ -17,6 +17,15 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
 
   (void)token_next(t);
 
+  // Newline
+
+  if (compare_token(*t, 1, TOKEN_NEWLINE) != TOKEN_NEWLINE) {
+    unexpected_token_expected(*t, TOKEN_NEWLINE, "newline", d);
+    return NULL;
+  }
+
+  (void)token_next(t);
+
   while (!is_fatal(d)) {
     token_kind_t token = (*t)->kind;
 
@@ -39,7 +48,10 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
           }
           break;
         case KW_IF:
-          // TODO: If statement
+          statement = parse_if_statement(t, d);
+          if (statement == NULL) {
+            goto CLEANUP;
+          }
           break;
         case KW_ELIF:
           diag_report_source(d, location, FATAL_ERROR_ELIF_WITHOUT_IF);
