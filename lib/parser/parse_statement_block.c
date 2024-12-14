@@ -60,7 +60,10 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
           diag_report_source(d, location, FATAL_ERROR_ELSE_WITHOUT_IF);
           goto CLEANUP;
         case KW_WHILE:
-          // TODO: While loop
+          statement = parse_while_loop(t, d);
+          if (statement == NULL) {
+            goto CLEANUP;
+          }
           break;
         case KW_FOR:
           // TODO: For loop

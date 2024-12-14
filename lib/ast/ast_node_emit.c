@@ -41,13 +41,16 @@ static emit_tree_section_build_func_t build_children_function_arguments;
 static emit_tree_section_build_func_t build_elements_if_statement;
 static emit_tree_section_build_func_t build_children_if_statement;
 
-static emit_tree_section_build_func_t build_children_if_statement_condition;
+static emit_tree_section_build_func_t build_children_statement_condition;
 
 static emit_tree_section_build_func_t build_elements_elif_statement;
 static emit_tree_section_build_func_t build_children_elif_statement;
 
 static emit_tree_section_build_func_t build_elements_else_statement;
 static emit_tree_section_build_func_t build_children_else_statement;
+
+static emit_tree_section_build_func_t build_elements_while_loop;
+static emit_tree_section_build_func_t build_children_while_loop;
 
 void ast_node_emit(ast_node_t* node, diagnostics_t* d) {
   build_node(node, 0, NULL, true, d);
@@ -142,6 +145,14 @@ static void build_node(ast_node_t* node,
       elements_func = &build_elements_if_statement;
       if (node->data.if_statement.body != NULL) {
         children_func = &build_children_if_statement;
+      }
+      break;
+    case AST_WHILE_LOOP:
+      color = 31;  // red
+      tag = "while_loop";
+      elements_func = &build_elements_while_loop;
+      if (node->data.while_loop.body != NULL) {
+        children_func = &build_children_while_loop;
       }
       break;
     default:
@@ -524,7 +535,7 @@ static void build_children_if_statement(void* _node,
 
   emit_tree_section(d, indent_size, indent, "condition", 1,
                     !has_body && !has_elifs && !has_else, NULL,
-                    build_children_if_statement_condition, node);
+                    build_children_statement_condition, data->condition);
 
   if (has_body) {
     build_node(data->body, indent_size, indent, !has_elifs && !has_else, d);
@@ -548,19 +559,15 @@ static void build_children_if_statement(void* _node,
   }
 }
 
-void build_children_if_statement_condition(void* _node,
-                                           size_t indent_size,
-                                           emit_tree_indent_data_t* indent,
-                                           diagnostics_t* d) {
+void build_children_statement_condition(void* _node,
+                                        size_t indent_size,
+                                        emit_tree_indent_data_t* indent,
+                                        diagnostics_t* d) {
   assert(_node != NULL);
   assert(d != NULL);
   ast_node_t* node = (ast_node_t*)_node;
 
-  assert(node->kind == AST_IF_STATEMENT);
-
-  ast_if_statement_data_t* data = &node->data.if_statement;
-
-  build_node(data->condition, indent_size, indent, true, d);
+  build_node(node, indent_size, indent, true, d);
 }
 
 void build_elements_elif_statement(void* _node,
@@ -589,7 +596,7 @@ void build_children_elif_statement(void* _node,
   ast_if_statement_data_t* data = &node->data.if_statement;
 
   emit_tree_section(d, indent_size, indent, "condition", 1, data->body == NULL,
-                    NULL, build_children_if_statement_condition, node);
+                    NULL, build_children_statement_condition, data->condition);
 
   if (data->body != NULL) {
     build_node(data->body, indent_size, indent, true, d);
@@ -620,6 +627,39 @@ void build_children_else_statement(void* _node,
   assert(node->kind == AST_IF_STATEMENT);
 
   ast_if_statement_data_t* data = &node->data.if_statement;
+
+  if (data->body != NULL) {
+    build_node(data->body, indent_size, indent, true, d);
+  }
+}
+
+static void build_elements_while_loop(void* _node,
+                                      size_t indent_size,
+                                      emit_tree_indent_data_t* indent,
+                                      diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_WHILE_LOOP);
+
+  range_emit(&node->location, indent_size, indent, d);
+}
+
+static void build_children_while_loop(void* _node,
+                                      size_t indent_size,
+                                      emit_tree_indent_data_t* indent,
+                                      diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_WHILE_LOOP);
+
+  ast_while_loop_data_t* data = &node->data.while_loop;
+
+  emit_tree_section(d, indent_size, indent, "condition", 1, data->body == NULL,
+                    NULL, build_children_statement_condition, data->condition);
 
   if (data->body != NULL) {
     build_node(data->body, indent_size, indent, true, d);

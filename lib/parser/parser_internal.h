@@ -20,6 +20,7 @@ ast_node_t* parse_function_call(token_t** t, diagnostics_t* d);
 
 ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d);
 ast_node_t* parse_if_statement(token_t** t, diagnostics_t* d);
+ast_node_t* parse_while_loop(token_t** t, diagnostics_t* d);
 
 bool parse_condition_statement(token_t** t,
                                keyword_kind_t keyword,

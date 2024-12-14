@@ -160,3 +160,15 @@ ast_node_t* ast_node_create_else_if_statement(ast_node_t* condition,
   return node;
 }
 
+ast_node_t* ast_node_create_while_loop(ast_node_t* condition,
+                                            ast_node_t* body,
+                                            source_range_t location) {
+  assert(condition != NULL);
+
+  ast_node_t* node = ast_node_create(AST_WHILE_LOOP);
+  node->location = node->error_location = location;
+  node->data.while_loop.condition = condition;
+  node->data.while_loop.body = body;
+
+  return node;
+}

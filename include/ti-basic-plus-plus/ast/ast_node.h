@@ -27,8 +27,8 @@ typedef enum {
   AST_FUNCTION_CALL,
 
   AST_IF_STATEMENT,
-  AST_WHILE_STATEMENT,
-  /* AST_FOR_STATEMENT, */
+  AST_WHILE_LOOP,
+  /* AST_FOR_LOOP, */
   AST_RETURN_STATEMENT,
 } ast_node_kind_t;
 
@@ -69,6 +69,11 @@ typedef struct ast_if_statement_data {
   struct ast_node* else_statement;
 } ast_if_statement_data_t;
 
+typedef struct ast_while_loop_data {
+  struct ast_node* condition;
+  struct ast_node* body;
+} ast_while_loop_data_t;
+
 typedef struct ast_node {
   ast_node_kind_t kind;
 
@@ -83,6 +88,7 @@ typedef struct ast_node {
     ast_variable_decl_data_t variable_decl;
     ast_function_decl_data_t function_decl;
     ast_if_statement_data_t if_statement;
+    ast_while_loop_data_t while_loop;
     const char* identifier;
     double numeric_literal;
     const char* string_literal;
@@ -142,6 +148,10 @@ ast_node_t* ast_node_create_if_statement(ast_node_t* condition,
 ast_node_t* ast_node_create_else_if_statement(ast_node_t* condition,
                                               ast_node_t* body,
                                               source_range_t location);
+
+ast_node_t* ast_node_create_while_loop(ast_node_t* condition,
+                                            ast_node_t* body,
+                                            source_range_t location);
 
 // Emits the AST node to the given stream.
 void ast_node_emit(ast_node_t* node, diagnostics_t* d);
