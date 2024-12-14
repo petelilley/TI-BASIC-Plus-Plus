@@ -69,7 +69,10 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
           // TODO: For loop
           break;
         case KW_RETURN:
-          // TODO: Return statement
+          statement = parse_return_statement(t, d);
+          if (statement == NULL) {
+            goto CLEANUP;
+          }
           break;
         case KW_RESERVE:
           diag_report_source(d, location, ERROR_RESERVE_NOT_GLOBAL);

@@ -52,6 +52,9 @@ static emit_tree_section_build_func_t build_children_else_statement;
 static emit_tree_section_build_func_t build_elements_while_loop;
 static emit_tree_section_build_func_t build_children_while_loop;
 
+static emit_tree_section_build_func_t build_elements_return_statement;
+static emit_tree_section_build_func_t build_children_return_statement;
+
 void ast_node_emit(ast_node_t* node, diagnostics_t* d) {
   build_node(node, 0, NULL, true, d);
 }
@@ -153,6 +156,14 @@ static void build_node(ast_node_t* node,
       elements_func = &build_elements_while_loop;
       if (node->data.while_loop.body != NULL) {
         children_func = &build_children_while_loop;
+      }
+      break;
+    case AST_RETURN_STATEMENT:
+      color = 31;  // red
+      tag = "return_stmt";
+      elements_func = &build_elements_return_statement;
+      if (node->data.return_statement.expr != NULL) {
+        children_func = &build_children_return_statement;
       }
       break;
     default:
@@ -664,5 +675,29 @@ static void build_children_while_loop(void* _node,
   if (data->body != NULL) {
     build_node(data->body, indent_size, indent, true, d);
   }
+}
+
+static void build_elements_return_statement(void* _node,
+                                            size_t indent_size,
+                                            emit_tree_indent_data_t* indent,
+                                            diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  assert(node->kind == AST_RETURN_STATEMENT);
+
+  range_emit(&node->location, indent_size, indent, d);
+}
+
+static void build_children_return_statement(void* _node,
+                                            size_t indent_size,
+                                            emit_tree_indent_data_t* indent,
+                                            diagnostics_t* d) {
+  assert(_node != NULL);
+  assert(d != NULL);
+  ast_node_t* node = (ast_node_t*)_node;
+
+  build_node(node->data.return_statement.expr, indent_size, indent, true, d);
 }
 
