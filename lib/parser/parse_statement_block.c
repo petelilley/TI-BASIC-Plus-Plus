@@ -26,8 +26,7 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
     if (token == TOKEN_NEWLINE) {
       (void)token_next(t);
       continue;
-    }
-    else if (token == TOKEN_KEYWORD) {
+    } else if (token == TOKEN_KEYWORD) {
       switch ((*t)->data.keyword) {
         case KW_NUMBER:
         case KW_STRING:
@@ -65,28 +64,33 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
           }
           break;
         case KW_NOT:
-          // TODO: Expression
+          statement = parse_expression(t, d);
+          if (statement == NULL) {
+            goto CLEANUP;
+          }
           break;
         default:
           unexpected_token(*t, TOKEN_KEYWORD, d);
           goto CLEANUP;
       }
-    }
-    else if (token == TOKEN_PUNCTUATOR) {
+    } else if (token == TOKEN_PUNCTUATOR) {
       punctuator_kind_t punct = (*t)->data.punctuator;
 
       if (punct == '}') {
         break;
-      }
-      else if (punct == '{') {
+      } else if (punct == '{') {
         statement = parse_statement_block(t, d);
-      }
-      else {
+      } else {
         unexpected_token(*t, TOKEN_PUNCTUATOR, d);
         goto CLEANUP;
       }
-    }
-    else {
+    } else if (token == TOKEN_IDENTIFIER || token == TOKEN_NUMBER_LITERAL ||
+               token == TOKEN_STRING_LITERAL) {
+      statement = parse_expression(t, d);
+      if (statement == NULL) {
+        goto CLEANUP;
+      }
+    } else {
       unexpected_token_expected(*t, TOKEN_UNKNOWN, "statement or '}'", d);
       goto CLEANUP;
     }
@@ -133,7 +137,11 @@ ast_node_t* parse_statement_block(token_t** t, diagnostics_t* d) {
   return block;
 
 CLEANUP:
-  // TODO: Cleanup
-  return NULL;
+  for (size_t num = arrlenu(statements), i = 0; i < num; ++i) {
+    ast_node_destroy(statements[i]);
+  }
+  arrfree(statements);
 
+  return NULL;
 }
+
