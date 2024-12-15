@@ -77,8 +77,7 @@ static void parse_prefix_operators(token_t** t, operator_kind_t** ops) {
       (void)token_next(t);
       continue;
     }
-    punctuator_kind_t punct_kind =
-        compare_punctuator(*t, 2, '+', '-');
+    punctuator_kind_t punct_kind = compare_punctuator(*t, 2, '+', '-');
     if (punct_kind == PUNCT_UNKNOWN) {
       break;
     }
@@ -110,8 +109,8 @@ static ast_node_t* parse_unit(token_t** t, diagnostics_t* d) {
       compare_token(*t, 4, TOKEN_IDENTIFIER, TOKEN_PUNCTUATOR,
                     TOKEN_NUMBER_LITERAL, TOKEN_STRING_LITERAL);
 
-  if (token_kind == TOKEN_UNKNOWN || (token_kind == TOKEN_PUNCTUATOR &&
-                                      (*t)->data.punctuator != '(')) {
+  if (token_kind == TOKEN_UNKNOWN ||
+      (token_kind == TOKEN_PUNCTUATOR && (*t)->data.punctuator != '(')) {
     unexpected_token_expected(*t, TOKEN_UNKNOWN, "expression", d);
     goto CLEANUP;
 
@@ -188,7 +187,7 @@ static operator_kind_t parse_operator(token_t** t, diagnostics_t* d) {
   }
 
   operator_kind_t op;
-  if ((*t)->kind != TOKEN_PUNCTUATOR || 
+  if ((*t)->kind != TOKEN_PUNCTUATOR ||
       (op = op_from_punctuator((*t)->data.punctuator), op == OP_UNKNOWN)) {
     return OP_UNKNOWN;
   }
@@ -208,18 +207,20 @@ static ast_node_t* compose_expression(expr_fragment_t** fragments) {
     return frag.data.unit;
   }
 
-  int highest_precedence = 0;
+  int highest_precedence = -1;
   size_t highest_precedence_index = 0;
 
   for (size_t i = 1; i < num_fragments; i += 2) {
-    expr_fragment_t frag = (*fragments)[i];
+    expr_fragment_t frag = (*fragments)[num_fragments - i - 1];
     assert(frag.kind == EXPR_OPERATOR);
     int precedence = op_get_precedence(frag.data.operator);
     if (precedence > highest_precedence) {
       highest_precedence = precedence;
-      highest_precedence_index = i;
+      highest_precedence_index = num_fragments - i - 1;
     }
   }
+
+  assert(highest_precedence >= 0);
 
   ast_node_t* lhs = (*fragments)[highest_precedence_index - 1].data.unit;
   operator_kind_t op = (*fragments)[highest_precedence_index].data.operator;
